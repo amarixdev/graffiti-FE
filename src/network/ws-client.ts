@@ -9,13 +9,13 @@ const socket: Socket = io("http://localhost:3000", {
 const sketch = new Canvas(socket);
 const saveButton = document.getElementById("save-button");
 const loadButton = document.getElementById("load-button");
+const clearButton = document.getElementById("clear-button");
 
 socket.on("stroke", (data: Stroke) => {
   sketch.broadcast(data);
 });
 
-socket.on("loaded-tags", (data: Array<Stroke>) => {
-  console.log("running");
+socket.on("boot-up", (data: Array<Stroke>) => {
   sketch.loadCanvas(data);
 });
 
@@ -23,6 +23,22 @@ saveButton?.addEventListener("click", () => {
   sketch.save();
 });
 
+clearButton?.addEventListener("click", () => {
+  socket.emit("clear");
+});
+
+socket.on("clear", () => {
+  sketch.clear();
+});
+
+
+//FOR TESTING ONLY
 loadButton?.addEventListener("click", () => {
-  sketch.load();
+  socket.emit("load");
+});
+
+//load canvas on click
+socket.on("loaded-tags", (data: Array<Stroke>) => {
+  console.log("running");
+  sketch.loadCanvas(data);
 });

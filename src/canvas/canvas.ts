@@ -1,6 +1,7 @@
 import p5 from "p5";
 import { Socket } from "socket.io-client";
 import Stroke from "./stroke";
+import HelperFunctions from "../util/functions";
 
 export default class Canvas {
   #socket: Socket;
@@ -15,17 +16,15 @@ export default class Canvas {
   }
 
   //broadcast live paint stroke from websocket server data
-  broadcast(data: Stroke) {
-    this.#p.noStroke();
-    this.#p.fill(255);
-    this.#p.ellipse(data.x, data.y, 30, 30);
+  broadcast(stroke: Stroke) {
+    const rgb = HelperFunctions.stringToRGB(stroke.color);
+    this.#spray(stroke.x, stroke.y, rgb, stroke.size);
   }
 
   loadCanvas(data: Array<Stroke>) {
     data.forEach((stroke) => {
-      this.#p.noStroke();
-      this.#p.fill(255);
-      this.#p.ellipse(stroke.x, stroke.y, 30, 30);
+      const rgb = HelperFunctions.stringToRGB(stroke.color);
+      this.#spray(stroke.x, stroke.y, rgb, stroke.size);
     });
   }
 
@@ -33,12 +32,11 @@ export default class Canvas {
     this.#socket.emit("save", this.#tag);
   }
 
-  load() {
-    this.#socket.emit("load");
+  clear() {
+    this.#p = new p5(this.#init);
   }
 
   #init = (p: p5) => {
-    //setup canvas (will eventually switch to 3js)
     p.setup = () => {
       p.createCanvas(this.#canvasDimensions, this.#canvasDimensions);
       p.background(51);
@@ -46,29 +44,40 @@ export default class Canvas {
 
     //handlePainting
     p.mouseDragged = () => {
-      const color = {
-        r: 70,
-        g: 45,
-        b: 138,
-      };
-      const strokeWidth = 30;
-
-      p.noStroke();
-      p.fill(color.r, color.g, color.b);
-      p.ellipse(p.mouseX, p.mouseY, strokeWidth, strokeWidth);
-
-      const colorString = `rgb(${color.r}, ${color.g}, ${color.b})`;
-
+      const rgb = [70, 45, 138];
+      const strokeWidth = 5;
+      const colorString = `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
       const strokeMessage: Stroke = {
         x: p.mouseX,
         y: p.mouseY,
         color: colorString,
         size: strokeWidth,
       };
-      //send paint stroke to server
-      this.#socket.emit("stroke", strokeMessage);
-      //create tag to save work
-      this.#tag.push(strokeMessage);
+
+      this.#spray(p.mouseX, p.mouseY, rgb, strokeWidth);
+      this.#sendToServer(strokeMessage);
     };
   };
+
+  #spray(x: number, y: number, color: number[], size: number) {
+    let p = this.#p;
+    let density = 50;
+    for (let i = 0; i < density; i++) {
+      let angle = p.random(p.TWO_PI);
+      let radius = p.random(0, 20);
+      let offsetX = p.cos(angle) * radius;
+      let offsetY = p.sin(angle) * radius;
+      let alpha = p.map(radius, 0, 20, 255, 0);
+      p.noStroke();
+      p.fill(color[0], color[1], color[2], alpha);
+      p.ellipse(x + offsetX, y + offsetY, size, size);
+    }
+  }
+
+  #sendToServer(strokeMessage: Stroke) {
+    //send paint stroke to server
+    this.#socket.emit("stroke", strokeMessage);
+    //create tag to save work
+    this.#tag.push(strokeMessage);
+  }
 }

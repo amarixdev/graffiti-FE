@@ -66,6 +66,7 @@ button {
   background-color: #1a1a1a;
   cursor: pointer;
   transition: border-color 0.25s;
+  margin-left: 10px;
 }
 #save-button:hover {
   border-color: #646cff;
@@ -73,6 +74,10 @@ button {
 
 #load-button:hover {
   border-color: #64ffe5;
+}
+
+#clear-button:hover {
+  border-color: #ff6464;
 }
 @media (prefers-color-scheme: light) {
   :root {
