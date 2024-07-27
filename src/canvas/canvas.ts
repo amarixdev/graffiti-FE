@@ -6,13 +6,16 @@ import HelperFunctions from "../util/functions";
 export default class Canvas {
   #socket: Socket;
   #p: p5;
-  #canvasDimensions: number = 800;
-  //the artist tag
   #tag: Array<Stroke> = new Array();
+  #color: Array<number> = [0, 0, 0];
 
   constructor(socket: Socket) {
     this.#socket = socket;
     this.#p = new p5(this.#init);
+  }
+
+  setColor(rgb: Array<number>) {
+    this.#color = rgb;
   }
 
   //broadcast live paint stroke from websocket server data
@@ -38,13 +41,13 @@ export default class Canvas {
 
   #init = (p: p5) => {
     p.setup = () => {
-      p.createCanvas(this.#canvasDimensions, this.#canvasDimensions);
+      p.createCanvas(800, 800);
       p.background(51);
     };
 
     //handlePainting
     p.mouseDragged = () => {
-      const rgb = [70, 45, 138];
+      const rgb = this.#color;
       const strokeWidth = 5;
       const colorString = `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
       const strokeMessage: Stroke = {
