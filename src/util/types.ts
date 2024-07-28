@@ -1,0 +1,4 @@
+enum LoadState {
+  new,
+  resize,
+}

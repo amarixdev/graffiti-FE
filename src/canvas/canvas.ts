@@ -7,12 +7,20 @@ export default class Canvas {
   #socket: Socket;
   #p: p5;
   #tag: Array<Stroke> = new Array();
-  #color: Array<number> = [0, 0, 0];
+  #color: Array<number> = [255, 255, 255];
   #weight: number = 5;
+  #scaleFactor: number = 1.0;
+  #offsetX: number = 50;
+  #offsetY: number = 50;
+  #previousState: Array<Stroke> = new Array();
 
   constructor(socket: Socket) {
     this.#socket = socket;
     this.#p = new p5(this.#init);
+  }
+
+  setPreviousState(tag: Array<Stroke>) {
+    this.#previousState = tag;
   }
 
   setColor(rgb: Array<number>) {
@@ -23,6 +31,18 @@ export default class Canvas {
     this.#weight = weight;
   }
 
+  setScaleFactor(zoom: string) {
+    if (zoom == "out") {
+      this.#scaleFactor = Math.max(this.#scaleFactor - 0.1, 0.1);
+    }
+    if (zoom == "in") {
+      this.#scaleFactor = Math.min(this.#scaleFactor + 0.1, 1);
+    }
+
+    this.clear();
+    this.#p.redraw();
+  }
+
   //broadcast live paint stroke from websocket server data
   broadcast(stroke: Stroke) {
     const rgb = HelperFunctions.stringToRGB(stroke.color);
@@ -30,6 +50,8 @@ export default class Canvas {
   }
 
   loadCanvas(data: Array<Stroke>) {
+    console.log("canvas loaded");
+    console.log(data);
     data.forEach((stroke) => {
       const rgb = HelperFunctions.stringToRGB(stroke.color);
       this.#spray(stroke.x, stroke.y, rgb, stroke.size);
@@ -41,27 +63,40 @@ export default class Canvas {
   }
 
   clear() {
-    this.#p = new p5(this.#init);
+    this.#p.clear();
+    this.#p.background(51);
   }
 
   #init = (p: p5) => {
     p.setup = () => {
-      p.createCanvas(800, 800);
+      p.createCanvas(p.windowWidth, p.windowHeight);
       p.background(51);
+      p.noLoop();
     };
 
-    //handlePainting
+    p.draw = () => {
+      console.log("running");
+      p.translate(this.#offsetX, this.#offsetY);
+      p.scale(this.#scaleFactor);
+      this.loadCanvas(this.#tag);
+      this.loadCanvas(this.#previousState);
+    };
+
+    // handlePainting
     p.mouseDragged = () => {
       const rgb = this.#color;
       const colorString = `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
+      let xPos = (p.mouseX - this.#offsetX) / this.#scaleFactor;
+      let yPos = (p.mouseY - this.#offsetY) / this.#scaleFactor;
+
       const strokeMessage: Stroke = {
-        x: p.mouseX,
-        y: p.mouseY,
+        x: xPos,
+        y: yPos,
         color: colorString,
         size: this.#weight,
       };
 
-      this.#spray(p.mouseX, p.mouseY, rgb, this.#weight);
+      this.#spray(xPos, yPos, rgb, this.#weight);
       this.#sendToServer(strokeMessage);
     };
   };

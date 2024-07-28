@@ -13,6 +13,8 @@ const loadButton = document.getElementById("load-button");
 const clearButton = document.getElementById("clear-button");
 const colorPicker = document.getElementById("color-picker");
 const slider = document.getElementById("weight-slider");
+const zoomIn = document.getElementById("zoom-in");
+const zoomOut = document.getElementById("zoom-out");
 
 socket.on("stroke", (data: Stroke) => {
   sketch.broadcast(data);
@@ -20,6 +22,7 @@ socket.on("stroke", (data: Stroke) => {
 
 socket.on("boot-up", (data: Array<Stroke>) => {
   sketch.loadCanvas(data);
+  sketch.setPreviousState(data);
 });
 
 saveButton?.addEventListener("click", () => {
@@ -28,6 +31,7 @@ saveButton?.addEventListener("click", () => {
 
 clearButton?.addEventListener("click", () => {
   socket.emit("clear");
+  sketch.clear();
 });
 
 colorPicker?.addEventListener("input", (e: Event) => {
@@ -40,8 +44,13 @@ slider?.addEventListener("input", (e: Event) => {
   sketch.setWeight(parseInt(target.value));
 });
 
-socket.on("clear", () => {
-  sketch.clear();
+zoomIn?.addEventListener("click", () => {
+  console.log("clicked");
+  sketch.setScaleFactor("in");
+});
+
+zoomOut?.addEventListener("click", () => {
+  sketch.setScaleFactor("out");
 });
 
 //FOR TESTING ONLY
