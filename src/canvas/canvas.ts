@@ -8,6 +8,7 @@ export default class Canvas {
   #p: p5;
   #tag: Array<Stroke> = new Array();
   #color: Array<number> = [0, 0, 0];
+  #weight: number = 5;
 
   constructor(socket: Socket) {
     this.#socket = socket;
@@ -16,6 +17,10 @@ export default class Canvas {
 
   setColor(rgb: Array<number>) {
     this.#color = rgb;
+  }
+
+  setWeight(weight: number) {
+    this.#weight = weight;
   }
 
   //broadcast live paint stroke from websocket server data
@@ -48,16 +53,15 @@ export default class Canvas {
     //handlePainting
     p.mouseDragged = () => {
       const rgb = this.#color;
-      const strokeWidth = 5;
       const colorString = `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
       const strokeMessage: Stroke = {
         x: p.mouseX,
         y: p.mouseY,
         color: colorString,
-        size: strokeWidth,
+        size: this.#weight,
       };
 
-      this.#spray(p.mouseX, p.mouseY, rgb, strokeWidth);
+      this.#spray(p.mouseX, p.mouseY, rgb, this.#weight);
       this.#sendToServer(strokeMessage);
     };
   };
@@ -67,7 +71,7 @@ export default class Canvas {
     let density = 50;
     for (let i = 0; i < density; i++) {
       let angle = p.random(p.TWO_PI);
-      let radius = p.random(0, 20);
+      let radius = p.random(0, 12);
       let offsetX = p.cos(angle) * radius;
       let offsetY = p.sin(angle) * radius;
       let alpha = p.map(radius, 0, 20, 255, 0);
