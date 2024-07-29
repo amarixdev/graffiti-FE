@@ -7,7 +7,7 @@ import HelperFunctions from "../util/functions";
 const socket: Socket = io("http://localhost:3000", {
   withCredentials: true,
 });
-const sketch = new Canvas(socket);
+const canvas = new Canvas(socket);
 const saveButton = document.getElementById("save-button");
 const loadButton = document.getElementById("load-button");
 const clearButton = document.getElementById("clear-button");
@@ -17,40 +17,40 @@ const zoomIn = document.getElementById("zoom-in");
 const zoomOut = document.getElementById("zoom-out");
 
 socket.on("stroke", (data: Stroke) => {
-  sketch.broadcast(data);
+  canvas.broadcast(data);
 });
 
 socket.on("boot-up", (data: Array<Stroke>) => {
-  sketch.loadCanvas(data);
-  sketch.setPreviousState(data);
+  canvas.loadCanvas(data);
+  canvas.setPreviousState(data);
 });
 
 saveButton?.addEventListener("click", () => {
-  sketch.save();
+  canvas.save();
 });
 
 clearButton?.addEventListener("click", () => {
   socket.emit("clear");
-  sketch.clear();
+  canvas.clear();
 });
 
 colorPicker?.addEventListener("input", (e: Event) => {
   const target = e.target as HTMLInputElement;
-  sketch.setColor(HelperFunctions.hexToRgb(target.value));
+  canvas.setColor(HelperFunctions.hexToRgb(target.value));
 });
 
 slider?.addEventListener("input", (e: Event) => {
   const target = e.target as HTMLInputElement;
-  sketch.setWeight(parseInt(target.value));
+  canvas.setWeight(parseInt(target.value));
 });
 
 zoomIn?.addEventListener("click", () => {
   console.log("clicked");
-  sketch.setScaleFactor("in");
+  canvas.setScaleFactor("in");
 });
 
 zoomOut?.addEventListener("click", () => {
-  sketch.setScaleFactor("out");
+  canvas.setScaleFactor("out");
 });
 
 //FOR TESTING ONLY
@@ -61,5 +61,5 @@ loadButton?.addEventListener("click", () => {
 //load canvas on click
 socket.on("loaded-tags", (data: Array<Stroke>) => {
   console.log("running");
-  sketch.loadCanvas(data);
+  canvas.loadCanvas(data);
 });

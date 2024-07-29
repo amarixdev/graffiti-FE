@@ -9,9 +9,9 @@ export default class Canvas {
   #tag: Array<Stroke> = new Array();
   #color: Array<number> = [255, 255, 255];
   #weight: number = 5;
-  #scaleFactor: number = 1.0;
-  #offsetX: number = 50;
-  #offsetY: number = 50;
+  #scaleFactor: number = 0.5;
+  #offsetX: number = 0;
+  #offsetY: number = 0;
   #previousState: Array<Stroke> = new Array();
 
   constructor(socket: Socket) {
@@ -32,13 +32,16 @@ export default class Canvas {
   }
 
   setScaleFactor(zoom: string) {
+    const maxScale = 1.0;
+    const minScale = 0.05;
     if (zoom == "out") {
-      this.#scaleFactor = Math.max(this.#scaleFactor - 0.1, 0.1);
+      if (this.#scaleFactor == minScale) return;
+      this.#scaleFactor = Math.max(this.#scaleFactor - 0.1, minScale);
     }
     if (zoom == "in") {
-      this.#scaleFactor = Math.min(this.#scaleFactor + 0.1, 1);
+      if (this.#scaleFactor == maxScale) return;
+      this.#scaleFactor = Math.min(this.#scaleFactor + 0.1, maxScale);
     }
-
     this.clear();
     this.#p.redraw();
   }
@@ -49,31 +52,36 @@ export default class Canvas {
     this.#spray(stroke.x, stroke.y, rgb, stroke.size);
   }
 
+  //recreate canvas from provided Stroke values
   loadCanvas(data: Array<Stroke>) {
     console.log("canvas loaded");
-    console.log(data);
     data.forEach((stroke) => {
       const rgb = HelperFunctions.stringToRGB(stroke.color);
       this.#spray(stroke.x, stroke.y, rgb, stroke.size);
     });
   }
-
+  //send local painting to server for storage
   save() {
     this.#socket.emit("save", this.#tag);
   }
 
+  //clear canvas pixels, reset background
   clear() {
     this.#p.clear();
     this.#p.background(51);
   }
 
   #init = (p: p5) => {
-    p.setup = () => {
-      p.createCanvas(p.windowWidth, p.windowHeight);
-      p.background(51);
-      p.noLoop();
-    };
-
+    const container = document.getElementById("canvas-container");
+    if (container) {
+      p.setup = () => {
+        p.createCanvas(p.windowWidth * 5, p.windowHeight * 5).parent(
+          "canvas-container"
+        );
+        p.background(51);
+        p.noLoop();
+      };
+    }
     p.draw = () => {
       console.log("running");
       p.translate(this.#offsetX, this.#offsetY);
@@ -97,10 +105,11 @@ export default class Canvas {
       };
 
       this.#spray(xPos, yPos, rgb, this.#weight);
-      this.#sendToServer(strokeMessage);
+      this.#publishToServer(strokeMessage);
     };
   };
 
+  //spray paint simulation
   #spray(x: number, y: number, color: number[], size: number) {
     let p = this.#p;
     let density = 50;
@@ -116,7 +125,8 @@ export default class Canvas {
     }
   }
 
-  #sendToServer(strokeMessage: Stroke) {
+  //live update websockets server with real-time paint strokes
+  #publishToServer(strokeMessage: Stroke) {
     //send paint stroke to server
     this.#socket.emit("stroke", strokeMessage);
     //create tag to save work
