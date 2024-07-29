@@ -9,11 +9,37 @@
     <title>Spray Chat</title>
   </head>
 
-  <body class="bg-gradient-to-br flex flex-col items-center">
+  <body class="bg-gradient-to-br flex flex-col items-between relative">
+    <div
+      class="left-4 top-2 flex flex-col items-center absolute h-[550px] w-[280px] rounded-md bg-[#111] z-50 shadow-black shadow-md px-4 py-2"
+    >
+      <button class="flex justify-between items-center w-full pl-2">
+        <h1 class="text-[#c4c4c4] text-sm mb-2 min-w-fit font-light">
+          Live Chat
+        </h1>
+
+        <div class="flex text-sm items-start justify-end w-full px-2">
+          <h3 class="text-[#c4c4c4] mb-2 font-light">Artists online:</h3>
+          <h3 class="text-lime-500 ml-2 font-light">1</h3>
+        </div>
+      </button>
+      <div
+        class="w-full overflow-scroll border-[1px] border-[#333] rounded-lg bg-[#000000] h-[500px] relative"
+      ></div>
+      <form id="chat-form" action="" class="w-full">
+        <input
+          type="text"
+          placeholder="Say hello..."
+          id="chat-input"
+          class="bg-[#2c2c2c] text-sm pl-4 text-[#e3e3e3] font-light w-full h-10 mt-4 shadow-black shadow-sm rounded-full"
+        />
+      </form>
+    </div>
     <div
       id="canvas-container"
       class="fixed z-0 h-full w-full overflow-scroll"
     ></div>
+
     <div
       id="controls-y"
       class="w-[200px] rounded-md z-10 h-[500px] fixed right-5 flex flex-col items-center bg-[#111] shadow-black shadow-md p-4"
@@ -22,7 +48,7 @@
         <di
           class="relative border-blue-400 border-b-2 rounded-md px-10 h-10 mb-5"
         >
-          <h1 class="text-white text-2xl font-thin">Color</h1>
+          <h1 class="text-[#c4c4c4] text-2xl font-thin">Color</h1>
         </di>
         <input
           type="color"
@@ -31,37 +57,27 @@
           class="opacity-100 rounded-md"
         />
       </div>
-      <div class="">
+      <div class="flex flex-col gap-2 items-center">
         <button id="save-button" class="button-54" role="button">
           Save TAG
         </button>
+        <button id="clear-button" class="button-54" role="button">RESET</button>
       </div>
 
       <div class="w-full flex justify-evenly absolute bottom-0 pb-5">
         <button
           id="zoom-out"
-          class="text-[#bababa] scale-100 active:scale-95 transition-all border-[#bababa] border-2 w-20 h-20 rounded-md text-5xl hover:border-white hover:text-white"
+          class="text-[#bababa] scale-100 active:scale-95 transition-all border-[#bababa] border-2 w-16 h-16 rounded-md text-5xl hover:border-white hover:text-white"
         >
           -
         </button>
         <button
           id="zoom-in"
-          class="text-[#bababa] scale-100 active:scale-95 transition-all border-[#bababa] border-2 w-20 h-20 rounded-md text-5xl hover:border-white hover:text-white"
+          class="text-[#bababa] scale-100 active:scale-95 transition-all border-[#bababa] border-2 w-16 h-16 rounded-md text-5xl hover:border-white hover:text-white"
         >
           +
         </button>
       </div>
-    </div>
-
-    <div
-      id="controls-X"
-      class="text-white flex items-center justify-center w-full h-32 z-10 fixed bottom-5"
-    >
-      <input
-        type="text"
-        placeholder="Say hello..."
-        class="bg-[#121212] w-10/12 h-12 shadow-black shadow-sm rounded-full px-10"
-      />
     </div>
 
     <!--Scripts-->

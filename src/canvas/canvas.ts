@@ -9,18 +9,15 @@ export default class Canvas {
   #tag: Array<Stroke> = new Array();
   #color: Array<number> = [255, 255, 255];
   #weight: number = 5;
-  #scaleFactor: number = 0.5;
+  #scaleFactor: number = 1;
   #offsetX: number = 0;
   #offsetY: number = 0;
-  #previousState: Array<Stroke> = new Array();
+  prevX: number = 0;
+  prevY: number = 0;
 
   constructor(socket: Socket) {
     this.#socket = socket;
     this.#p = new p5(this.#init);
-  }
-
-  setPreviousState(tag: Array<Stroke>) {
-    this.#previousState = tag;
   }
 
   setColor(rgb: Array<number>) {
@@ -48,13 +45,11 @@ export default class Canvas {
 
   //broadcast live paint stroke from websocket server data
   broadcast(stroke: Stroke) {
-    const rgb = HelperFunctions.stringToRGB(stroke.color);
-    this.#spray(stroke.x, stroke.y, rgb, stroke.size);
+    this.#sprayB(stroke);
   }
 
   //recreate canvas from provided Stroke values
   loadCanvas(data: Array<Stroke>) {
-    console.log("canvas loaded");
     data.forEach((stroke) => {
       const rgb = HelperFunctions.stringToRGB(stroke.color);
       this.#spray(stroke.x, stroke.y, rgb, stroke.size);
@@ -68,7 +63,7 @@ export default class Canvas {
   //clear canvas pixels, reset background
   clear() {
     this.#p.clear();
-    this.#p.background(51);
+    this.#p.background(200,200,200);
   }
 
   #init = (p: p5) => {
@@ -78,16 +73,14 @@ export default class Canvas {
         p.createCanvas(p.windowWidth * 5, p.windowHeight * 5).parent(
           "canvas-container"
         );
-        p.background(51);
-        p.noLoop();
+        p.background(200, 200, 200);
       };
     }
+
     p.draw = () => {
-      console.log("running");
       p.translate(this.#offsetX, this.#offsetY);
       p.scale(this.#scaleFactor);
-      this.loadCanvas(this.#tag);
-      this.loadCanvas(this.#previousState);
+      this.#spray(p.mouseX, p.mouseY, this.#color, this.#weight);
     };
 
     // handlePainting
@@ -97,38 +90,100 @@ export default class Canvas {
       let xPos = (p.mouseX - this.#offsetX) / this.#scaleFactor;
       let yPos = (p.mouseY - this.#offsetY) / this.#scaleFactor;
 
+      //sent previous x/y to server
       const strokeMessage: Stroke = {
         x: xPos,
         y: yPos,
+        px: this.prevX,
+        py: this.prevY,
         color: colorString,
         size: this.#weight,
       };
-
-      this.#spray(xPos, yPos, rgb, this.#weight);
       this.#publishToServer(strokeMessage);
     };
   };
 
-  //spray paint simulation
   #spray(x: number, y: number, color: number[], size: number) {
     let p = this.#p;
     let density = 50;
-    for (let i = 0; i < density; i++) {
-      let angle = p.random(p.TWO_PI);
-      let radius = p.random(0, 12);
-      let offsetX = p.cos(angle) * radius;
-      let offsetY = p.sin(angle) * radius;
-      let alpha = p.map(radius, 0, 20, 255, 0);
-      p.noStroke();
-      p.fill(color[0], color[1], color[2], alpha);
-      p.ellipse(x + offsetX, y + offsetY, size, size);
+
+    // Store the previous mouse position
+    if (!this.prevX || !this.prevY) {
+      this.prevX = x;
+      this.prevY = y;
     }
+
+    // Calculate the distance between the current and previous positions
+    let distance = p.dist(x, y, this.prevX, this.prevY);
+    let steps = Math.ceil(distance / size);
+
+    for (let i = 0; i < steps; i++) {
+      let interX = p.lerp(this.prevX, x, i / steps);
+      let interY = p.lerp(this.prevY, y, i / steps);
+
+      for (let j = 0; j < density; j++) {
+        let angle = p.random(p.TWO_PI);
+        let radius = p.random(0, 12);
+        let offsetX = p.cos(angle) * radius;
+        let offsetY = p.sin(angle) * radius;
+        let alpha = p.map(radius, 0, 12, 255, 0);
+
+        if (p.mouseIsPressed) {
+          p.noStroke();
+          p.fill(color[0], color[1], color[2], alpha * 0.3); // Adjust opacity as needed
+          p.ellipse(interX + offsetX, interY + offsetY, size, size);
+        }
+      }
+    }
+
+    // Update the previous mouse position
+    this.prevX = x;
+    this.prevY = y;
+  }
+
+  #sprayB(stroke: Stroke) {
+    let { x, y, px, py, size, color } = stroke;
+    let p = this.#p;
+    let density = 50;
+    const rgb = HelperFunctions.stringToRGB(color);
+
+    // Store the previous mouse position
+    if (!px || !py) {
+      px = x;
+      py = y;
+    }
+
+    // Calculate the distance between the current and previous positions
+    let distance = p.dist(x, y, px, py);
+    let steps = Math.ceil(distance / size);
+
+    for (let i = 0; i < steps; i++) {
+      let interX = p.lerp(px, x, i / steps);
+      let interY = p.lerp(py, y, i / steps);
+
+      for (let j = 0; j < density; j++) {
+        let angle = p.random(p.TWO_PI);
+        let radius = p.random(0, 12);
+        let offsetX = p.cos(angle) * radius;
+        let offsetY = p.sin(angle) * radius;
+        let alpha = p.map(radius, 0, 12, 255, 0);
+
+        p.noStroke();
+        p.fill(rgb[0], rgb[1], rgb[2], alpha * 0.3); // Adjust opacity as needed
+        p.ellipse(interX + offsetX, interY + offsetY, size, size);
+      }
+    }
+
+    // Update the previous mouse position
+    this.prevX = x;
+    this.prevY = y;
   }
 
   //live update websockets server with real-time paint strokes
   #publishToServer(strokeMessage: Stroke) {
     //send paint stroke to server
     this.#socket.emit("stroke", strokeMessage);
+    console.log("send");
     //create tag to save work
     this.#tag.push(strokeMessage);
   }

@@ -15,6 +15,8 @@ const colorPicker = document.getElementById("color-picker");
 const slider = document.getElementById("weight-slider");
 const zoomIn = document.getElementById("zoom-in");
 const zoomOut = document.getElementById("zoom-out");
+const chatInput = document.getElementById("chat-input") as HTMLInputElement;
+const chatForm = document.getElementById("chat-form");
 
 socket.on("stroke", (data: Stroke) => {
   canvas.broadcast(data);
@@ -22,7 +24,7 @@ socket.on("stroke", (data: Stroke) => {
 
 socket.on("boot-up", (data: Array<Stroke>) => {
   canvas.loadCanvas(data);
-  canvas.setPreviousState(data);
+  // canvas.setPreviousState(data);
 });
 
 saveButton?.addEventListener("click", () => {
@@ -51,6 +53,16 @@ zoomIn?.addEventListener("click", () => {
 
 zoomOut?.addEventListener("click", () => {
   canvas.setScaleFactor("out");
+});
+
+chatForm?.addEventListener("submit", (e) => {
+  e.preventDefault();
+  let message = chatInput.value;
+  if (message) {
+    console.log(message);
+    socket.emit("chat", message);
+    chatInput.value = "";
+  }
 });
 
 //FOR TESTING ONLY
