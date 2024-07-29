@@ -5,6 +5,7 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link href="src/output.css" rel="stylesheet" />
+    <link href="src/chatstyles.css" rel="stylesheet" />
     <link rel="stylesheet" href="src/button.css" />
     <title>Spray Chat</title>
   </head>
@@ -18,14 +19,24 @@
           Live Chat
         </h1>
 
-        <div class="flex text-sm items-start justify-end w-full px-2">
+        <div
+          class="flex text-sm items-start justify-between min-w-[130px] px-2"
+        >
           <h3 class="text-[#c4c4c4] mb-2 font-light">Artists online:</h3>
-          <h3 class="text-lime-500 ml-2 font-light">1</h3>
+          <h3 id="artists-online" class="text-lime-500 ml-2 font-light"></h3>
         </div>
       </button>
       <div
-        class="w-full overflow-scroll border-[1px] border-[#333] rounded-lg bg-[#000000] h-[500px] relative"
-      ></div>
+        id="chat-log"
+        class="w-full overflow-y-auto p-4 border-[1px] border-[#333] rounded-lg bg-[#000000] h-[500px] flex flex-col-reverse"
+      >
+        <div class="flex flex-col bg-[#333] rounded-md">
+          <p class="text-white text-sm px-4">blossom-logistical4</p>
+          <p class="text-white text-sm font-thin px-4 break-words">
+            HelloWregfregregregergwerwgrerewrwqerwqrerwqreorld
+          </p>
+        </div>
+      </div>
       <form id="chat-form" action="" class="w-full">
         <input
           type="text"
@@ -42,7 +53,7 @@
 
     <div
       id="controls-y"
-      class="w-[200px] rounded-md z-10 h-[500px] fixed right-5 flex flex-col items-center bg-[#111] shadow-black shadow-md p-4"
+      class="w-[200px] border-[1px] top-20 rounded-md z-10 h-[500px] fixed right-5 flex flex-col items-center bg-[#111] shadow-black shadow-md p-4"
     >
       <div class="flex flex-col p-5 items-center">
         <di
