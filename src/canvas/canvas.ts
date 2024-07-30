@@ -1,7 +1,7 @@
 import p5 from "p5";
 import { Socket } from "socket.io-client";
 import Stroke from "./stroke";
-import HelperFunctions from "../util/functions";
+import Paint from "../util/functions";
 
 export default class Canvas {
   #socket: Socket;
@@ -21,7 +21,11 @@ export default class Canvas {
   }
 
   setColor(rgb: Array<number>) {
+    const colorPicker = document.getElementById(
+      "color-picker"
+    ) as HTMLInputElement;
     this.#color = rgb;
+    colorPicker.value = Paint.rgbToHex(this.#color);
   }
 
   setWeight(weight: number) {
@@ -51,7 +55,7 @@ export default class Canvas {
   //recreate canvas from provided Stroke values
   loadCanvas(data: Array<Stroke>) {
     data.forEach((stroke) => {
-      const rgb = HelperFunctions.stringToRGB(stroke.color);
+      const rgb = Paint.stringToRGB(stroke.color);
       this.#spray(stroke.x, stroke.y, rgb, stroke.size);
     });
   }
@@ -63,7 +67,7 @@ export default class Canvas {
   //clear canvas pixels, reset background
   clear() {
     this.#p.clear();
-    this.#p.background(200,200,200);
+    this.#p.background(200, 200, 200);
   }
 
   #init = (p: p5) => {
@@ -100,6 +104,41 @@ export default class Canvas {
         size: this.#weight,
       };
       this.#publishToServer(strokeMessage);
+    };
+
+    p.keyTyped = () => {
+      let key = p.key;
+      switch (key) {
+        case "v":
+          this.setColor(Paint.violet);
+          break;
+        case "i":
+          this.setColor(Paint.indigo);
+          break;
+        case "b":
+          this.setColor(Paint.blue);
+          break;
+        case "g":
+          this.setColor(Paint.green);
+          break;
+        case "y":
+          this.setColor(Paint.yellow);
+          break;
+        case "o":
+          this.setColor(Paint.orange);
+          break;
+        case "r":
+          this.setColor(Paint.red);
+          break;
+        case "k":
+          this.setColor(Paint.black);
+          break;
+        case "w":
+          this.setColor(Paint.white);
+          break;
+        default:
+          return;
+      }
     };
   };
 
@@ -145,7 +184,7 @@ export default class Canvas {
     let { x, y, px, py, size, color } = stroke;
     let p = this.#p;
     let density = 50;
-    const rgb = HelperFunctions.stringToRGB(color);
+    const rgb = Paint.stringToRGB(color);
 
     // Store the previous mouse position
     if (!px || !py) {

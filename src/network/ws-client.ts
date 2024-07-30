@@ -2,7 +2,7 @@ import { io } from "socket.io-client";
 import Canvas from "../canvas/canvas";
 import { Socket } from "socket.io-client";
 import Stroke from "../canvas/stroke";
-import HelperFunctions from "../util/functions";
+import Paint from "../util/functions";
 import { SocketType } from "../util/types";
 
 const socket: Socket = io("http://localhost:3000", {
@@ -44,7 +44,7 @@ clearButton?.addEventListener("click", () => {
 
 colorPicker?.addEventListener("input", (e: Event) => {
   const target = e.target as HTMLInputElement;
-  canvas.setColor(HelperFunctions.hexToRgb(target.value));
+  canvas.setColor(Paint.hexToRgb(target.value));
 });
 
 slider?.addEventListener("input", (e: Event) => {
@@ -88,6 +88,13 @@ chatForm?.addEventListener("submit", (e) => {
     chatInput.value = "";
   }
 });
+
+for (let i = 0; i < Paint.keys.length; i++) {
+  const btn = document.getElementById(`color-btn-${Paint.keys[i]}`);
+  btn?.addEventListener("click", () => {
+    canvas.setColor(Paint.values[i]);
+  });
+}
 
 function addMessage(message: string, type: SocketType, user: string) {
   // Create the container div
