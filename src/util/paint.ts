@@ -38,6 +38,10 @@ export default class Paint {
         return parseInt(color.trim());
       });
   }
+  /**Converts an array of RGB values to an RGB string  */
+  static RGBToString(rgb: Array<number>) {
+    return `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
+  }
 
   /**Converts a hex code string to an array of RGB values */
   static hexToRgb(hex: string): [number, number, number] {

@@ -3,22 +3,23 @@ import { Socket } from "socket.io-client";
 import Stroke from "./stroke";
 import Paint from "../util/paint";
 import SocketHandler from "../socket-handler";
+import { SocketType } from "../util/types";
 
 export default class Canvas {
-  #socket: Socket;
-  #p: p5;
-  #tag: Array<Stroke> = new Array();
-  #color: Array<number> = [255, 255, 255];
-  #weight: number = 5;
-  #scaleFactor: number = 1;
-  #offsetX: number = 0;
-  #offsetY: number = 0;
-  prevX: number = 0;
-  prevY: number = 0;
+  private socket: Socket;
+  private p: p5;
+  private tag: Array<Stroke> = new Array();
+  private color: Array<number> = [255, 255, 255];
+  private weight: number = 5;
+  private scaleFactor: number = 1;
+  private offsetX: number = 0;
+  private offsetY: number = 0;
+  private prevX: number = 0;
+  private prevY: number = 0;
 
   private constructor(socket: Socket) {
-    this.#socket = socket;
-    this.#p = new p5(this.#init);
+    this.socket = socket;
+    this.p = new p5(this.init);
   }
 
   //ensure a single instance of the socket is created
@@ -34,53 +35,55 @@ export default class Canvas {
     const colorPicker = document.getElementById(
       "color-picker"
     ) as HTMLInputElement;
-    this.#color = rgb;
-    colorPicker.value = Paint.rgbToHex(this.#color);
+    this.color = rgb;
+    colorPicker.value = Paint.rgbToHex(this.color);
   }
 
   setWeight(weight: number) {
-    this.#weight = weight;
+    this.weight = weight;
   }
 
   setScaleFactor(zoom: string) {
     const maxScale = 1.0;
     const minScale = 0.05;
     if (zoom == "out") {
-      if (this.#scaleFactor == minScale) return;
-      this.#scaleFactor = Math.max(this.#scaleFactor - 0.1, minScale);
+      if (this.scaleFactor == minScale) return;
+      this.scaleFactor = Math.max(this.scaleFactor - 0.1, minScale);
     }
     if (zoom == "in") {
-      if (this.#scaleFactor == maxScale) return;
-      this.#scaleFactor = Math.min(this.#scaleFactor + 0.1, maxScale);
+      if (this.scaleFactor == maxScale) return;
+      this.scaleFactor = Math.min(this.scaleFactor + 0.1, maxScale);
     }
     this.clear();
-    this.#p.redraw();
+    this.p.redraw();
   }
 
   //broadcast live paint stroke from websocket server data
   broadcast(stroke: Stroke) {
-    this.#sprayB(stroke);
+    this.spray(stroke, SocketType.remote);
   }
 
   //recreate canvas from provided Stroke values
   loadCanvas(data: Array<Stroke>) {
     data.forEach((stroke) => {
-      const rgb = Paint.stringToRGB(stroke.color);
-      this.#spray(stroke.x, stroke.y, rgb, stroke.size);
+      this.spray(stroke, SocketType.remote);
     });
   }
-  //send local painting to server for storage
-  save() {
-    this.#socket.emit("save", this.#tag);
-  }
 
-  //clear canvas pixels, reset background
+  //clear canvas pixels; reset background
   clear() {
-    this.#p.clear();
-    this.#p.background(200, 200, 200);
+    this.p.clear();
+    this.p.background(200, 200, 200);
   }
 
-  #init = (p: p5) => {
+  //send local painting to server for storage; reset current tag
+  private save() {
+    this.socket.emit("save", this.tag);
+    this.disableSaveBtn();
+    this.tag = [];
+  }
+
+  private init = (p: p5) => {
     const container = document.getElementById("canvas-container");
     if (container) {
       p.setup = () => {
@@ -92,17 +95,30 @@ export default class Canvas {
     }
 
     p.draw = () => {
-      p.translate(this.#offsetX, this.#offsetY);
-      p.scale(this.#scaleFactor);
-      this.#spray(p.mouseX, p.mouseY, this.#color, this.#weight);
+      p.translate(this.offsetX, this.offsetY);
+      p.scale(this.scaleFactor);
+
+      const stroke: Stroke = {
+        x: p.mouseX,
+        y: p.mouseY,
+        px: this.prevX,
+        py: this.prevY,
+        color: Paint.RGBToString(this.color),
+        size: this.weight,
+      };
+
+      this.spray(stroke, SocketType.user);
     };
 
     // handlePainting
     p.mouseDragged = () => {
-      const rgb = this.#color;
-      const colorString = `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
-      let xPos = (p.mouseX - this.#offsetX) / this.#scaleFactor;
-      let yPos = (p.mouseY - this.#offsetY) / this.#scaleFactor;
+      //enable save button
+      if (this.tag.length == 0) {
+        this.enableSaveBtn();
+      }
+
+      let xPos = (p.mouseX - this.offsetX) / this.scaleFactor;
+      let yPos = (p.mouseY - this.offsetY) / this.scaleFactor;
 
       //sent previous x/y to server
       const strokeMessage: Stroke = {
@@ -110,10 +126,10 @@ export default class Canvas {
         y: yPos,
         px: this.prevX,
         py: this.prevY,
-        color: colorString,
-        size: this.#weight,
+        color: Paint.RGBToString(this.color),
+        size: this.weight,
       };
-      this.#publishToServer(strokeMessage);
+      this.publishToServer(strokeMessage);
     };
 
     p.keyTyped = () => {
@@ -152,49 +168,42 @@ export default class Canvas {
     };
   };
 
-  #spray(x: number, y: number, color: number[], size: number) {
-    let p = this.#p;
-    let density = 50;
-
-    // Store the previous mouse position
-    if (!this.prevX || !this.prevY) {
-      this.prevX = x;
-      this.prevY = y;
+  private enableSaveBtn() {
+    const saveButton = document.getElementById("save-btn");
+    const saveButtonContainer = document.getElementById("save-btn-container");
+    if (saveButton && saveButtonContainer) {
+      saveButton.style.opacity = "100%";
+      saveButton.classList.add("active:scale-95");
+      saveButton.classList.remove("cursor-not-allowed");
+      saveButtonContainer.classList.add("group");
     }
-
-    // Calculate the distance between the current and previous positions
-    let distance = p.dist(x, y, this.prevX, this.prevY);
-    let steps = Math.ceil(distance / size);
-
-    for (let i = 0; i < steps; i++) {
-      let interX = p.lerp(this.prevX, x, i / steps);
-      let interY = p.lerp(this.prevY, y, i / steps);
-
-      for (let j = 0; j < density; j++) {
-        let angle = p.random(p.TWO_PI);
-        let radius = p.random(0, 12);
-        let offsetX = p.cos(angle) * radius;
-        let offsetY = p.sin(angle) * radius;
-        let alpha = p.map(radius, 0, 12, 255, 0);
-
-        if (p.mouseIsPressed) {
-          p.noStroke();
-          p.fill(color[0], color[1], color[2], alpha * 0.3); // Adjust opacity as needed
-          p.ellipse(interX + offsetX, interY + offsetY, size, size);
-        }
-      }
-    }
-
-    // Update the previous mouse position
-    this.prevX = x;
-    this.prevY = y;
+    saveButton?.addEventListener("click", () => {
+      console.log("clicked");
+      this.save();
+    });
   }
 
-  #sprayB(stroke: Stroke) {
+  private disableSaveBtn() {
+    const saveButton = document.getElementById("save-btn");
+    const saveButtonContainer = document.getElementById("save-btn-container");
+    if (saveButton && saveButtonContainer) {
+      saveButton.style.opacity = "25%";
+      saveButton.classList.remove("active:scale-95");
+      saveButton.classList.add("cursor-not-allowed");
+      saveButtonContainer.classList.remove("group");
+    }
+    saveButton?.removeEventListener("click", () => {
+      console.log("clicked");
+      this.save();
+    });
+  }
+
+  private spray(stroke: Stroke, type: SocketType) {
     let { x, y, px, py, size, color } = stroke;
-    let p = this.#p;
+    let p = this.p;
     let density = 50;
-    const rgb = Paint.stringToRGB(color);
+
+    let rgb = Paint.stringToRGB(color);
 
     // Store the previous mouse position
     if (!px || !py) {
@@ -217,9 +226,20 @@ export default class Canvas {
         let offsetY = p.sin(angle) * radius;
         let alpha = p.map(radius, 0, 12, 255, 0);
 
-        p.noStroke();
-        p.fill(rgb[0], rgb[1], rgb[2], alpha * 0.3); // Adjust opacity as needed
-        p.ellipse(interX + offsetX, interY + offsetY, size, size);
+        if (type == SocketType.user) {
+          if (p.mouseIsPressed) {
+            drawEllipse();
+          }
+        }
+        if (type == SocketType.remote) {
+          drawEllipse();
+        }
+
+        function drawEllipse() {
+          p.noStroke();
+          p.fill(rgb[0], rgb[1], rgb[2], alpha * 0.3); // Adjust opacity as needed
+          p.ellipse(interX + offsetX, interY + offsetY, size, size);
+        }
       }
     }
 
@@ -229,11 +249,11 @@ export default class Canvas {
   }
 
   //live update websockets server with real-time paint strokes
-  #publishToServer(strokeMessage: Stroke) {
+  private publishToServer(strokeMessage: Stroke) {
     //send paint stroke to server
-    this.#socket.emit("stroke", strokeMessage);
+    this.socket.emit("stroke", strokeMessage);
     console.log("send");
     //create tag to save work
-    this.#tag.push(strokeMessage);
+    this.tag.push(strokeMessage);
   }
 }

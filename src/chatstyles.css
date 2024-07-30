@@ -15,7 +15,7 @@
 }
 
 .chat-container p.user {
-  font-size: 0.875rem; /* text-sm equivalent */
+  font-size: 0.675rem; /* text-sm equivalent */
 }
 
 .chat-container p.message {

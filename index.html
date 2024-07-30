@@ -50,7 +50,8 @@
       id="canvas-container"
       class="fixed z-0 h-full w-full overflow-scroll"
     ></div>
-    <div
+
+    <header
       class="flex justify-between items-center fixed w-full h-10 bg-[#101010] k top-0 px-5"
     >
       <div class="flex font-thin items-center gap-2">
@@ -103,58 +104,57 @@
 
         <div class="flex items-center gap-2">
           <div class="w-2 h-2 rounded-full bg-lime-500"></div>
-          <h3 id="user-tag" class="text-white font-thin text-sm">
-            tantamount-subordination1
-          </h3>
+          <h3 id="user-tag" class="text-white font-thin text-sm"></h3>
         </div>
       </div>
-    </div>
-    <!-- <div
-      id="controls-y"
-      class="w-[200px] border-[1px] top-20 rounded-md z-10 h-[500px] fixed right-5 flex flex-col items-center bg-[#111] shadow-black shadow-md p-4"
+    </header>
+    <div
+      id="save-btn-container"
+      class="fixed top-14 right-4 flex flex-col gap-3 items-center"
     >
-      <div class="flex flex-col p-5 items-center">
-        <di
-          class="relative border-blue-400 border-b-2 rounded-md px-10 h-10 mb-5"
+      <button id="save-btn" class="flex px-2 transition-all opacity-25 cursor-not-allowed">
+        <div
+          class="shadow-sm transition-all rounded-r-none rounded-l-full shadow-black flex items-center justify-center z-10 w-14 h-14 bg-black text-white"
         >
-          <h1 class="text-[#c4c4c4] text-2xl font-thin">Color</h1>
-        </di>
-        <input
-          type="color"
-          id="color-picker"
-          value="#FFFFFF"
-          class="opacity-100 rounded-md"
-        />
-      </div>
-      <div class="flex flex-col gap-2 items-center">
-        <button id="save-button" class="button-54" role="button">
-          Save TAG
-        </button>
-        <button id="clear-button" class="button-54" role="button">RESET</button>
-      </div>
+          <p class="text-white font-thin text-4xl -translate-y-[2px]">+</p>
+        </div>
+        <div
+          class="shadow-sm ease-linear transition-all rounded-l-none shadow-black flex items-center justify-center z-10 w-14 h-14 bg-black rounded-r-full text-white"
+        >
+          <p class="text-white font-medium mx-2 pr-5">TAG</p>
+        </div>
+      </button>
 
-      <div class="w-full flex justify-evenly absolute bottom-0 pb-5">
-        <button
-          id="zoom-out"
-          class="text-[#bababa] scale-100 active:scale-95 transition-all border-[#bababa] border-2 w-16 h-16 rounded-md text-5xl hover:border-white hover:text-white"
-        >
-          -
-        </button>
-        <button
-          id="zoom-in"
-          class="text-[#bababa] scale-100 active:scale-95 transition-all border-[#bababa] border-2 w-16 h-16 rounded-md text-5xl hover:border-white hover:text-white"
-        >
-          +
-        </button>
+      <!--Clear Button [DEV]-->
+      <div
+        class="text-xs font-semibold opacity-0 group-hover:opacity-80 transition-opacity ease-in flex flex-col items-center"
+      >
+        <p>Save your art to the canvas.</p>
+        <p>You can also press [Enter]</p>
       </div>
-    </div> -->
+    </div>
 
-    <!--Scripts-->
+    <button
+      id="clear-btn"
+      class="flex px-2 active:scale-95 transition-all fixed bottom-5 right-5"
+    >
+      <div
+        class="shadow-sm transition-all rounded-r-none rounded-l-full shadow-red-600 flex items-center justify-center z-10 w-14 h-14 bg-red-600 text-white"
+      >
+        <p class="text-white font-thin text-4xl -translate-y-[2px]">-</p>
+      </div>
+      <div
+        class="shadow-sm ease-linear transition-all rounded-l-none shadow-red-600 flex items-center justify-center z-10 w-14 h-14 bg-red-600 rounded-r-full text-white"
+      >
+        <p class="text-white font-medium mx-2 pr-5">Reset</p>
+      </div>
+    </button>
+    <!--scripts-->
     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
     <script>
       const socket = io();
     </script>
-    <script type="module" src="/src/network/ws-client.ts"></script>
+    <script type="module" src="/src/main.ts"></script>
     <script type="module" src="/src/canvas/canvas.ts"></script>
   </body>
 </html>
