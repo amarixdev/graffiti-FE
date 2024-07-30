@@ -1,7 +1,8 @@
 import p5 from "p5";
 import { Socket } from "socket.io-client";
 import Stroke from "./stroke";
-import Paint from "../util/functions";
+import Paint from "../util/paint";
+import SocketHandler from "../socket-handler";
 
 export default class Canvas {
   #socket: Socket;
@@ -15,9 +16,18 @@ export default class Canvas {
   prevX: number = 0;
   prevY: number = 0;
 
-  constructor(socket: Socket) {
+  private constructor(socket: Socket) {
     this.#socket = socket;
     this.#p = new p5(this.#init);
+  }
+
+  //ensure a single instance of the socket is created
+  private static instance: Canvas;
+  static getInstance() {
+    if (!Canvas.instance) {
+      Canvas.instance = new Canvas(SocketHandler.getInstance().getSocket());
+    }
+    return Canvas.instance;
   }
 
   setColor(rgb: Array<number>) {

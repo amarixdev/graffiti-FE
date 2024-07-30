@@ -2,137 +2,137 @@ import { io } from "socket.io-client";
 import Canvas from "../canvas/canvas";
 import { Socket } from "socket.io-client";
 import Stroke from "../canvas/stroke";
-import Paint from "../util/functions";
+import Paint from "../util/paint";
 import { SocketType } from "../util/types";
+import SocketHandler from "../socket-handler";
+import ChatHandler from "../live-chat";
+import Interface from "../interface";
 
-const socket: Socket = io("http://localhost:3000", {
-  withCredentials: true,
-});
-const canvas = new Canvas(socket);
-const saveButton = document.getElementById("save-button");
-const loadButton = document.getElementById("load-button");
-const clearButton = document.getElementById("clear-button");
-const colorPicker = document.getElementById("color-picker");
-const slider = document.getElementById("weight-slider");
-const zoomIn = document.getElementById("zoom-in");
-const zoomOut = document.getElementById("zoom-out");
-const chatInput = document.getElementById("chat-input") as HTMLInputElement;
-const chatForm = document.getElementById("chat-form");
-const chatLog = document.getElementById("chat-log");
-const artistsOnline = document.getElementById("artists-online");
+//Socket
+// const socket: Socket = io("http://localhost:3000", {
+//   withCredentials: true,
+// });
+// const canvas = Canvas.getInstance();
 
-let username: string = "";
+const socketHandler = SocketHandler.getInstance();
+socketHandler.setUpListeners();
+new Interface().setup();
+new ChatHandler().setup();
 
-socket.on("stroke", (data: Stroke) => {
-  canvas.broadcast(data);
-});
+// socket.on("stroke", (data: Stroke) => {
+//   canvas.broadcast(data);
+// });
 
-socket.on("boot-up", (data: Array<Stroke>, user: string) => {
-  canvas.loadCanvas(data);
-  username = user;
-  // canvas.setPreviousState(data);
-});
+// socket.on("boot-up", (data: Array<Stroke>, user: string) => {
+//   canvas.loadCanvas(data);
+//   username = user;
+//   if (userTag) {
+//     userTag.textContent = user;
+//   }
+// });
 
-saveButton?.addEventListener("click", () => {
-  canvas.save();
-});
+// //UI
+// const saveButton = document.getElementById("save-button");
+// const clearButton = document.getElementById("clear-button");
+// const colorPicker = document.getElementById("color-picker");
+// const zoomIn = document.getElementById("zoom-in");
+// const zoomOut = document.getElementById("zoom-out");
 
-clearButton?.addEventListener("click", () => {
-  socket.emit("clear");
-  canvas.clear();
-});
+// const userTag = document.getElementById("user-tag");
 
-colorPicker?.addEventListener("input", (e: Event) => {
-  const target = e.target as HTMLInputElement;
-  canvas.setColor(Paint.hexToRgb(target.value));
-});
+// //chat
+// const chatInput = document.getElementById("chat-input") as HTMLInputElement;
+// const chatForm = document.getElementById("chat-form");
+// const chatLog = document.getElementById("chat-log");
 
-slider?.addEventListener("input", (e: Event) => {
-  const target = e.target as HTMLInputElement;
-  canvas.setWeight(parseInt(target.value));
-});
+// //User
+// const artistsOnline = document.getElementById("artists-online");
+// let username: string = "";
 
-zoomIn?.addEventListener("click", () => {
-  console.log("clicked");
-  canvas.setScaleFactor("in");
-});
+// saveButton?.addEventListener("click", () => {
+//   canvas.save();
+// });
 
-zoomOut?.addEventListener("click", () => {
-  canvas.setScaleFactor("out");
-});
+// clearButton?.addEventListener("click", () => {
+//   socket.emit("clear");
+//   canvas.clear();
+// });
 
-//handle client connection
-socket.on("client-connected", (data: number) => {
-  if (artistsOnline) {
-    artistsOnline.innerText = `${data}`;
-  }
-});
+// colorPicker?.addEventListener("input", (e: Event) => {
+//   const target = e.target as HTMLInputElement;
+//   canvas.setColor(Paint.hexToRgb(target.value));
+// });
 
-socket.on("client-disconnected", (data: number) => {
-  if (artistsOnline) {
-    artistsOnline.innerText = `${data}`;
-  }
-});
+// zoomIn?.addEventListener("click", () => {
+//   console.log("clicked");
+//   canvas.setScaleFactor("in");
+// });
 
-//handle live chat
-socket.on("chat", (data: string, user: string) => {
-  addMessage(data, SocketType.remote, user);
-});
+// zoomOut?.addEventListener("click", () => {
+//   canvas.setScaleFactor("out");
+// });
 
-chatForm?.addEventListener("submit", (e) => {
-  e.preventDefault();
-  let message = chatInput.value;
-  if (message) {
-    socket.emit("chat", message);
-    addMessage(message, SocketType.user, username);
-    chatInput.value = "";
-  }
-});
+// //handle client connection
+// socket.on("client-connected", (data: number) => {
+//   if (artistsOnline) {
+//     artistsOnline.innerText = `${data}`;
+//   }
+// });
 
-for (let i = 0; i < Paint.keys.length; i++) {
-  const btn = document.getElementById(`color-btn-${Paint.keys[i]}`);
-  btn?.addEventListener("click", () => {
-    canvas.setColor(Paint.values[i]);
-  });
-}
+// socket.on("client-disconnected", (data: number) => {
+//   if (artistsOnline) {
+//     artistsOnline.innerText = `${data}`;
+//   }
+// });
 
-function addMessage(message: string, type: SocketType, user: string) {
-  // Create the container div
-  const newMessage = document.createElement("div");
-  newMessage.className = "chat-container";
+// //handle live chat
+// socket.on("chat", (data: string, user: string) => {
+//   addMessage(data, SocketType.remote, user);
+// });
 
-  // Set the background color based on the message type
-  if (type === SocketType.remote) {
-    newMessage.style.backgroundColor = "#333"; // Apply background color directly
-  } else if (type === SocketType.user) {
-    newMessage.style.backgroundColor = "#2a92e8"; // Apply background color directly
-  }
+// chatForm?.addEventListener("submit", (e) => {
+//   e.preventDefault();
+//   let message = chatInput.value;
+//   if (message) {
+//     socket.emit("chat", message);
+//     addMessage(message, SocketType.user, username);
+//     chatInput.value = "";
+//   }
+// });
 
-  // Create the user paragraph
-  const userBubble = document.createElement("p");
-  userBubble.className = "user";
-  userBubble.textContent = user;
+// for (let i = 0; i < Paint.keys.length; i++) {
+//   const btn = document.getElementById(`color-btn-${Paint.keys[i]}`);
+//   btn?.addEventListener("click", () => {
+//     canvas.setColor(Paint.values[i]);
+//   });
+// }
 
-  // Create the message paragraph
-  const remoteBubble = document.createElement("p");
-  remoteBubble.className = "message";
-  remoteBubble.textContent = message;
+// function addMessage(message: string, type: SocketType, user: string) {
+//   // Create the container div
+//   const newMessage = document.createElement("div");
+//   newMessage.className = "chat-container";
 
-  // Append paragraphs to the container span
-  newMessage.appendChild(userBubble);
-  newMessage.appendChild(remoteBubble);
+//   // Set the background color based on the message type
+//   if (type === SocketType.remote) {
+//     newMessage.style.backgroundColor = "#333"; // Apply background color directly
+//   } else if (type === SocketType.user) {
+//     newMessage.style.backgroundColor = "#2a92e8"; // Apply background color directly
+//   }
 
-  // Insert the new message as the first child
-  chatLog?.insertBefore(newMessage, chatLog.firstChild);
-}
+//   // Create the user paragraph
+//   const userBubble = document.createElement("p");
+//   userBubble.className = "user";
+//   userBubble.textContent = user;
 
-//FOR TESTING ONLY
-loadButton?.addEventListener("click", () => {
-  socket.emit("load");
-});
+//   // Create the message paragraph
+//   const remoteBubble = document.createElement("p");
+//   remoteBubble.className = "message";
+//   remoteBubble.textContent = message;
 
-//load canvas on click
-socket.on("loaded-tags", (data: Array<Stroke>) => {
-  console.log("running");
-  canvas.loadCanvas(data);
-});
+//   // Append paragraphs to the container span
+//   newMessage.appendChild(userBubble);
+//   newMessage.appendChild(remoteBubble);
+
+//   // Insert the new message as the first child
+//   chatLog?.insertBefore(newMessage, chatLog.firstChild);
+// }
