@@ -1,3 +1,5 @@
+import Canvas from "../canvas/canvas";
+
 export default class Paint {
   static red = [255, 0, 0];
   static orange = [255, 127, 0];
@@ -63,5 +65,40 @@ export default class Paint {
     };
 
     return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+  }
+
+  static colorSwitch(key: string) {
+    const canvas = Canvas.getInstance();
+    switch (key) {
+      case "v":
+        canvas.setColor(this.violet);
+        break;
+      case "i":
+        canvas.setColor(this.indigo);
+        break;
+      case "b":
+        canvas.setColor(this.blue);
+        break;
+      case "g":
+        canvas.setColor(this.green);
+        break;
+      case "y":
+        canvas.setColor(this.yellow);
+        break;
+      case "o":
+        canvas.setColor(this.orange);
+        break;
+      case "r":
+        canvas.setColor(this.red);
+        break;
+      case "k":
+        canvas.setColor(this.black);
+        break;
+      case "w":
+        canvas.setColor(this.white);
+        break;
+      default:
+        return;
+    }
   }
 }

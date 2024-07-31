@@ -3,21 +3,21 @@ import { Socket } from "socket.io-client";
 import Stroke from "./stroke";
 import Paint from "../util/paint";
 import SocketHandler from "../socket-handler";
-import { SocketType } from "../util/types";
+import { Button, SocketType } from "../util/enums";
+import Interface from "../interface";
 
 export default class Canvas {
   private socket: Socket;
   private p: p5;
   private tag: Array<Stroke> = new Array();
-  private tagState: Array<Array<Stroke>> = new Array();
-  private strokeState: Array<Stroke> = new Array();
-
+  private paintStrokes: Array<Array<Stroke>> = new Array();
+  private paintStroke: Array<Stroke> = new Array();
   private isPainting: boolean = false;
-
   private color: Array<number> = [255, 255, 255];
   private weight: number = 5;
   private prevX: number = 0;
   private prevY: number = 0;
+  private interface: Interface = new Interface();
 
   private constructor(socket: Socket) {
     this.socket = socket;
@@ -64,10 +64,25 @@ export default class Canvas {
   }
 
   //send local painting to server for storage; reset current tag
-  private save() {
-    this.socket.emit("save", this.tag);
-    this.disableSaveBtn();
+  save() {
+    const tag = this.paintStrokes.flat();
+    this.socket.emit("save", tag);
+    this.interface.saveBtn_toggle(Button.disabled);
     this.tag = [];
+    this.clear();
+  }
+
+  undo() {
+    this.paintStrokes.pop();
+    this.clear();
+    //TODO: <!BUG!> deleting loaded data..
+    this.paintStrokes.forEach((stroke) => {
+      this.loadCanvas(stroke);
+    });
+
+    if (this.paintStrokes.length == 0) {
+      this.interface.undoBtn_toggle(Button.disabled);
+    }
   }
 
   private init = (p: p5) => {
@@ -107,8 +122,8 @@ export default class Canvas {
     p.mouseDragged = () => {
       //enable save button
       if (this.tag.length == 0) {
-        this.enableSaveBtn();
-        this.enableUndoBtn();
+        this.interface.saveBtn_toggle(Button.enabled);
+        this.interface.undoBtn_toggle(Button.enabled);
       }
       const strokeMessage: Stroke = {
         x: p.mouseX,
@@ -123,99 +138,9 @@ export default class Canvas {
 
     p.keyTyped = () => {
       let key = p.key;
-      switch (key) {
-        case "v":
-          this.setColor(Paint.violet);
-          break;
-        case "i":
-          this.setColor(Paint.indigo);
-          break;
-        case "b":
-          this.setColor(Paint.blue);
-          break;
-        case "g":
-          this.setColor(Paint.green);
-          break;
-        case "y":
-          this.setColor(Paint.yellow);
-          break;
-        case "o":
-          this.setColor(Paint.orange);
-          break;
-        case "r":
-          this.setColor(Paint.red);
-          break;
-        case "k":
-          this.setColor(Paint.black);
-          break;
-        case "w":
-          this.setColor(Paint.white);
-          break;
-        default:
-          return;
-      }
+      Paint.colorSwitch(key);
     };
   };
-
-  private undo() {
-    this.tagState.pop();
-    this.clear();
-    this.tagState.forEach((tag) => {
-      this.loadCanvas(tag);
-    });
-  }
-
-  private enableSaveBtn() {
-    const saveButton = document.getElementById("save-btn");
-    const saveButtonContainer = document.getElementById("save-btn-container");
-    if (saveButton && saveButtonContainer) {
-      saveButton.style.opacity = "100%";
-      saveButton.classList.add("active:scale-95");
-      saveButton.classList.remove("cursor-not-allowed");
-      saveButtonContainer.classList.add("group");
-    }
-    saveButton?.addEventListener("click", () => {
-      this.save();
-    });
-  }
-
-  private enableUndoBtn() {
-    const undoButton = document.getElementById("undo-btn");
-    if (undoButton) {
-      undoButton.style.opacity = "100%";
-      undoButton.classList.add("active:scale-95");
-      undoButton.classList.remove("cursor-not-allowed");
-    }
-    undoButton?.addEventListener("click", () => {
-      this.undo();
-    });
-  }
-
-  private disableUndoBtn() {
-    const undoButton = document.getElementById("undo-btn");
-    if (undoButton) {
-      undoButton.style.opacity = "25%";
-      undoButton.classList.remove("active:scale-95");
-      undoButton.classList.add("cursor-not-allowed");
-    }
-    undoButton?.removeEventListener("click", () => {
-      this.undo();
-    });
-  }
-
-  private disableSaveBtn() {
-    const saveButton = document.getElementById("save-btn");
-    const saveButtonContainer = document.getElementById("save-btn-container");
-    if (saveButton && saveButtonContainer) {
-      saveButton.style.opacity = "25%";
-      saveButton.classList.remove("active:scale-95");
-      saveButton.classList.add("cursor-not-allowed");
-      saveButtonContainer.classList.remove("group");
-    }
-    saveButton?.removeEventListener("click", () => {
-      this.save();
-    });
-  }
 
   private spray(stroke: Stroke, type: SocketType) {
     let { x, y, px, py, size, color } = stroke;
@@ -246,25 +171,24 @@ export default class Canvas {
         let offsetY = p.sin(angle) * radius;
         let alpha = p.map(radius, 0, 12, 255, 0);
 
-        if (type == SocketType.user) {
-          if (p.mouseIsPressed) {
+        switch (type) {
+          case SocketType.user:
+            if (p.mouseIsPressed) {
+              drawEllipse();
+              if (!this.isPainting) {
+                this.isPainting = true;
+              }
+            } else {
+              //mouse lifted, save paintStrokes
+              if (this.isPainting) {
+                this.isPainting = false;
+                this.paintStrokes.push(this.paintStroke);
+                this.paintStroke = [];
+              }
+            }
+            break;
+          case SocketType.remote:
             drawEllipse();
-            if (!this.isPainting) {
-              this.isPainting = true;
-              console.log(this.isPainting);
-            }
-          } else {
-            //mouse lifted, save tagState
-            if (this.isPainting) {
-              this.isPainting = false;
-              this.tagState.push(this.strokeState);
-              this.strokeState = [];
-              console.log(this.tagState);
-            }
-          }
-        }
-        if (type == SocketType.remote) {
-          drawEllipse();
         }
 
         function drawEllipse() {
@@ -274,9 +198,11 @@ export default class Canvas {
         }
       }
     }
+
+    //saves individual strokes to an array (used for undo function)
     if (this.isPainting) {
-      this.strokeState.push(stroke);
-      console.log(this.strokeState);
+      this.paintStroke.push(stroke);
+      this.interface.undoBtn_toggle(Button.enabled);
     }
 
     // Update the previous mouse position

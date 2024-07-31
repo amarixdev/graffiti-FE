@@ -1,6 +1,6 @@
 import { Socket, io } from "socket.io-client";
 import ChatHandler from "./live-chat";
-import { SocketType } from "./util/types";
+import { SocketType } from "./util/enums";
 import Stroke from "./canvas/stroke";
 import Canvas from "./canvas/canvas";
 
@@ -21,8 +21,8 @@ export default class SocketHandler {
   });
   private sessionUsername: string = "";
   private artistsOnline = document.getElementById("artists-online");
-    private userTag = document.getElementById("user-tag");
-    
+  private userTag = document.getElementById("user-tag");
+
   getSocket() {
     return this.socket;
   }

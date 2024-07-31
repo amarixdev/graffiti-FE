@@ -3,7 +3,7 @@ import Canvas from "../canvas/canvas";
 import { Socket } from "socket.io-client";
 import Stroke from "../canvas/stroke";
 import Paint from "../util/paint";
-import { SocketType } from "../util/types";
+import { SocketType } from "../util/enums";
 import SocketHandler from "../socket-handler";
 import ChatHandler from "../live-chat";
 import Interface from "../interface";

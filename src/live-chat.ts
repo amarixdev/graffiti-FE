@@ -1,5 +1,5 @@
 import SocketHandler from "./socket-handler";
-import { SocketType } from "./util/types";
+import { SocketType } from "./util/enums";
 
 export default class ChatHandler {
   chatInput = document.getElementById("chat-input") as HTMLInputElement;
