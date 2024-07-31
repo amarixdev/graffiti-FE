@@ -87,12 +87,19 @@ export default class Canvas {
     const container = document.getElementById("canvas-container");
     if (container) {
       p.setup = () => {
-        p.createCanvas(p.windowWidth * 5, p.windowHeight * 5).parent(
-          "canvas-container"
+        p.createCanvas(container.offsetWidth, container.offsetHeight).parent(
+          container
         );
         p.background(200, 200, 200);
       };
     }
+
+    p.windowResized = () => {
+      const container = document.getElementById("canvas-container");
+      if (container) {
+        p.resizeCanvas(container.offsetWidth, container.offsetHeight);
+      }
+    };
 
     p.draw = () => {
       p.translate(this.offsetX, this.offsetY);
@@ -113,6 +120,7 @@ export default class Canvas {
     // handlePainting
     p.mouseDragged = () => {
       //enable save button
+
       if (this.tag.length == 0) {
         this.enableSaveBtn();
       }

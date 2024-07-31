@@ -110,7 +110,7 @@ new ChatHandler().setup();
 // function addMessage(message: string, type: SocketType, user: string) {
 //   // Create the container div
 //   const newMessage = document.createElement("div");
-//   newMessage.className = "chat-container";
+//   newMessage.className = "chat-bubble";
 
 //   // Set the background color based on the message type
 //   if (type === SocketType.remote) {
