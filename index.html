@@ -7,6 +7,10 @@
     <link href="src/output.css" rel="stylesheet" />
     <link href="src/chatstyles.css" rel="stylesheet" />
     <link rel="stylesheet" href="src/button.css" />
+    <link
+      href="https://unpkg.com/css.gg@2.0.0/icons/css/undo.css"
+      rel="stylesheet"
+    />
     <title>Spray Chat</title>
   </head>
 
@@ -112,34 +116,31 @@
         </div>
       </div>
     </header>
-    <div
-      id="save-btn-container"
-      class="fixed top-14 right-4 flex flex-col gap-3 items-center"
-    >
-      <button
-        id="save-btn"
-        class="flex px-2 transition-all opacity-25 cursor-not-allowed"
-      >
-        <div
-          class="shadow-sm transition-all rounded-r-none rounded-l-full shadow-black flex items-center justify-center z-10 w-14 h-14 bg-black text-white"
-        >
-          <p class="text-white font-thin text-4xl -translate-y-[2px]">+</p>
+    <div class="fixed top-14 right-4 flex flex-col gap-3 items-center">
+      <div class="flex px-2 flex-col gap-5 justify-end">
+        <div id="save-btn-container" class="flex justify-center items-center">
+          <div
+            class="mr-6 px-3 py-1 rounded-md bg-[#242424] h-fit border-[2px] border-[#4d4d4d] w-[150px] absolute text-xs font-semibold opacity-0 -translate-x-28 group-hover:opacity-80 transition-opacity ease-in"
+          >
+            <p class="text-white font-light">Save your art to the canvas.</p>
+          </div>
+          <button
+            id="save-btn"
+            class="shadow-sm transition-all opacity-25 cursor-not-allowed rounded-full shadow-black flex items-center justify-center z-10 w-14 h-14 bg-black text-white"
+          >
+            <p class="text-white font-thin text-4xl -translate-y-[2px]">+</p>
+          </button>
         </div>
-        <div
-          class="shadow-sm ease-linear transition-all rounded-l-none shadow-black flex items-center justify-center z-10 w-14 h-14 bg-black rounded-r-full text-white"
+        <button
+          id="undo-btn"
+          class="shadow-sm transition-all opacity-25 cursor-not-allowed rounded-full shadow-black flex items-center justify-center z-10 w-14 h-14 bg-[#390fd1] text-white"
         >
-          <p class="text-white font-medium mx-2 pr-5">POST</p>
-        </div>
-      </button>
-
-      <!--Clear Button [DEV]-->
-      <div
-        class="text-xs font-semibold opacity-0 group-hover:opacity-80 transition-opacity ease-in flex flex-col items-center"
-      >
-        <p>Save your art to the canvas.</p>
-        <p>You can also press [Enter]</p>
+          <i class="gg-undo text-lg"></i>
+        </button>
       </div>
     </div>
+
+    <!--Clear Button [DEV]-->
 
     <button
       id="clear-btn"

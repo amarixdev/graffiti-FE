@@ -9,11 +9,13 @@ export default class Canvas {
   private socket: Socket;
   private p: p5;
   private tag: Array<Stroke> = new Array();
+  private tagState: Array<Array<Stroke>> = new Array();
+  private strokeState: Array<Stroke> = new Array();
+
+  private isPainting: boolean = false;
+
   private color: Array<number> = [255, 255, 255];
   private weight: number = 5;
-  private scaleFactor: number = 1;
-  private offsetX: number = 0;
-  private offsetY: number = 0;
   private prevX: number = 0;
   private prevY: number = 0;
 
@@ -41,21 +43,6 @@ export default class Canvas {
 
   setWeight(weight: number) {
     this.weight = weight;
-  }
-
-  setScaleFactor(zoom: string) {
-    const maxScale = 1.0;
-    const minScale = 0.05;
-    if (zoom == "out") {
-      if (this.scaleFactor == minScale) return;
-      this.scaleFactor = Math.max(this.scaleFactor - 0.1, minScale);
-    }
-    if (zoom == "in") {
-      if (this.scaleFactor == maxScale) return;
-      this.scaleFactor = Math.min(this.scaleFactor + 0.1, maxScale);
-    }
-    this.clear();
-    this.p.redraw();
   }
 
   //broadcast live paint stroke from websocket server data
@@ -102,8 +89,7 @@ export default class Canvas {
     };
 
     p.draw = () => {
-      p.translate(this.offsetX, this.offsetY);
-      p.scale(this.scaleFactor);
+      // p.translate(this.offsetX, this.offsetY);
 
       const stroke: Stroke = {
         x: p.mouseX,
@@ -117,21 +103,16 @@ export default class Canvas {
       this.spray(stroke, SocketType.user);
     };
 
-    // handlePainting
+    //handles live stroke updates
     p.mouseDragged = () => {
       //enable save button
-
       if (this.tag.length == 0) {
         this.enableSaveBtn();
+        this.enableUndoBtn();
       }
-
-      let xPos = (p.mouseX - this.offsetX) / this.scaleFactor;
-      let yPos = (p.mouseY - this.offsetY) / this.scaleFactor;
-
-      //sent previous x/y to server
       const strokeMessage: Stroke = {
-        x: xPos,
-        y: yPos,
+        x: p.mouseX,
+        y: p.mouseY,
         px: this.prevX,
         py: this.prevY,
         color: Paint.RGBToString(this.color),
@@ -176,6 +157,14 @@ export default class Canvas {
     };
   };
 
+  private undo() {
+    this.tagState.pop();
+    this.clear();
+    this.tagState.forEach((tag) => {
+      this.loadCanvas(tag);
+    });
+  }
+
   private enableSaveBtn() {
     const saveButton = document.getElementById("save-btn");
     const saveButtonContainer = document.getElementById("save-btn-container");
@@ -186,8 +175,31 @@ export default class Canvas {
       saveButtonContainer.classList.add("group");
     }
     saveButton?.addEventListener("click", () => {
-      console.log("clicked");
       this.save();
+    });
+  }
+
+  private enableUndoBtn() {
+    const undoButton = document.getElementById("undo-btn");
+    if (undoButton) {
+      undoButton.style.opacity = "100%";
+      undoButton.classList.add("active:scale-95");
+      undoButton.classList.remove("cursor-not-allowed");
+    }
+    undoButton?.addEventListener("click", () => {
+      this.undo();
+    });
+  }
+
+  private disableUndoBtn() {
+    const undoButton = document.getElementById("undo-btn");
+    if (undoButton) {
+      undoButton.style.opacity = "25%";
+      undoButton.classList.remove("active:scale-95");
+      undoButton.classList.add("cursor-not-allowed");
+    }
+    undoButton?.removeEventListener("click", () => {
+      this.undo();
     });
   }
 
@@ -201,7 +213,6 @@ export default class Canvas {
       saveButtonContainer.classList.remove("group");
     }
     saveButton?.removeEventListener("click", () => {
-      console.log("clicked");
       this.save();
     });
   }
@@ -223,6 +234,7 @@ export default class Canvas {
     let distance = p.dist(x, y, px, py);
     let steps = Math.ceil(distance / size);
 
+    //spray-paint effect
     for (let i = 0; i < steps; i++) {
       let interX = p.lerp(px, x, i / steps);
       let interY = p.lerp(py, y, i / steps);
@@ -237,6 +249,18 @@ export default class Canvas {
         if (type == SocketType.user) {
           if (p.mouseIsPressed) {
             drawEllipse();
+            if (!this.isPainting) {
+              this.isPainting = true;
+              console.log(this.isPainting);
+            }
+          } else {
+            //mouse lifted, save tagState
+            if (this.isPainting) {
+              this.isPainting = false;
+              this.tagState.push(this.strokeState);
+              this.strokeState = [];
+              console.log(this.tagState);
+            }
           }
         }
         if (type == SocketType.remote) {
@@ -249,6 +273,10 @@ export default class Canvas {
           p.ellipse(interX + offsetX, interY + offsetY, size, size);
         }
       }
+    }
+    if (this.isPainting) {
+      this.strokeState.push(stroke);
+      console.log(this.strokeState);
     }
 
     // Update the previous mouse position
