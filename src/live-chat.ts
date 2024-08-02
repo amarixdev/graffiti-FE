@@ -9,6 +9,7 @@ export default class ChatHandler {
   chatPreview = document.getElementById("chat-preview");
 
   setup() {
+    console.log("set up");
     const socket = SocketHandler.getInstance();
     this.chatForm?.addEventListener("submit", (e) => {
       e.preventDefault();

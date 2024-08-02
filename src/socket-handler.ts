@@ -20,8 +20,6 @@ export default class SocketHandler {
     withCredentials: true,
   });
   private sessionUsername: string = "";
-  private artistsOnline = document.getElementById("artists-online");
-  private userTag = document.getElementById("user-tag");
 
   getSocket() {
     return this.socket;
@@ -33,15 +31,16 @@ export default class SocketHandler {
   setUpListeners() {
     const socket = this.socket;
     socket.on("client-connected", (data: number) => {
-      console.log(data);
-      if (this.artistsOnline) {
-        this.artistsOnline.innerText = `${data}`;
+      const artistsOnline = document.getElementById("artists-online");
+      if (artistsOnline) {
+        artistsOnline.innerText = `${data}`;
       }
     });
 
     socket.on("client-disconnected", (data: number) => {
-      if (this.artistsOnline) {
-        this.artistsOnline.innerText = `${data}`;
+      const artistsOnline = document.getElementById("artists-online");
+      if (artistsOnline) {
+        artistsOnline.innerText = `${data}`;
       }
     });
 
@@ -51,13 +50,20 @@ export default class SocketHandler {
 
     const canvas = Canvas.getInstance();
 
-    socket.on("boot-up", (data: Array<Stroke>, user: string) => {
-      canvas.loadCanvas(data);
-      this.sessionUsername = user;
-      if (this.userTag) {
-        this.userTag.textContent = user;
+    socket.on(
+      "boot-up",
+      (data: Array<Stroke>, user: string, clients: number) => {
+        const userTag = document.getElementById("user-tag");
+        const artistsOnline = document.getElementById("artists-online");
+        canvas.loadCanvas(data);
+        
+        this.sessionUsername = user;
+        if (userTag && artistsOnline) {
+          userTag.textContent = user;
+          artistsOnline.textContent = `${clients}`;
+        }
       }
-    });
+    );
 
     socket.on("stroke", (data: Stroke) => {
       canvas.broadcast(data);

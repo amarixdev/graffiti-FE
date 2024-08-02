@@ -96,12 +96,12 @@ export default class Canvas {
       };
     }
 
-    p.windowResized = () => {
-      const container = document.getElementById("canvas-container");
-      if (container) {
-        p.resizeCanvas(container.offsetWidth, container.offsetHeight);
-      }
-    };
+    // p.windowResized = () => {
+    //   const container = document.getElementById("canvas-container");
+    //   if (container) {
+    //     p.resizeCanvas(container.offsetWidth, container.offsetHeight);
+    //   }
+    // };
 
     p.draw = () => {
       // p.translate(this.offsetX, this.offsetY);

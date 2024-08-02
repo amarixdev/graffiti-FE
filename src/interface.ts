@@ -4,17 +4,25 @@ import Paint from "./util/paint";
 import { Button } from "./util/enums";
 
 export default class UserInterface {
-  private colorPicker = document.getElementById("color-picker");
-  private saveButton = document.getElementById("save-btn");
-  private saveButtonContainer = document.getElementById("save-btn-container");
-  private clearButton = document.getElementById("clear-btn");
-  private undoButton = document.getElementById("undo-btn");
+  private colorPicker: HTMLElement | null;
+  private saveButton: HTMLElement | null;
+  private saveButtonContainer: HTMLElement | null;
+  private clearButton: HTMLElement | null;
+  private undoButton: HTMLElement | null;
 
   private uiButtonStyles = {
     opacity: { enabled: "100%", disabled: "25%" },
     active_scale: "active:scale-95",
     cursor_allowed: "cursor-not-allowed",
   };
+
+  constructor() {
+    this.colorPicker = document.getElementById("color-picker");
+    this.saveButton = document.getElementById("save-btn");
+    this.saveButtonContainer = document.getElementById("save-btn-container");
+    this.clearButton = document.getElementById("clear-btn");
+    this.undoButton = document.getElementById("undo-btn");
+  }
 
   setup() {
     const canvas = Canvas.getInstance();
@@ -29,21 +37,27 @@ export default class UserInterface {
       canvas.clear();
     });
 
+    //header shortcut buttons
     for (let i = 0; i < Paint.keys.length; i++) {
       const btn = document.getElementById(`color-btn-${Paint.keys[i]}`);
       btn?.addEventListener("click", () => {
+        console.log("clicked");
         canvas.setColor(Paint.values[i]);
       });
     }
   }
 
   saveBtn_toggle(button: Button) {
+    //re-initialize for HTML injection
+    this.saveButton = document.getElementById("save-btn");
+    this.saveButtonContainer = document.getElementById("save-btn-container");
     if (this.saveButton && this.saveButtonContainer) {
       button == Button.enabled ? this.enableSaveBtn() : this.disableSaveBtn();
     }
   }
 
   undoBtn_toggle(button: Button) {
+    this.undoButton = document.getElementById("undo-btn");
     if (this.undoButton) {
       button == Button.enabled ? this.enableUndoBtn() : this.disableUndoBtn();
     }

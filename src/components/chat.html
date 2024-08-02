@@ -1,0 +1,25 @@
+<div
+  id="chat-container"
+  class="flex flex-col items-center min-w-[320px] rounded-md bg-[#1d1d1d] shadow-black shadow-md px-4 py-2"
+>
+  <div class="flex justify-between items-center w-full pl-2 mt-10">
+    <h1 class="text-[#d6d6d6] text-sm mb-2 min-w-fit font-light">Live Chat</h1>
+
+    <div class="flex text-sm items-start justify-between min-w-[130px] px-2">
+      <h3 class="text-[#d6d6d6] mb-2 font-light">Artists online:</h3>
+      <h3 id="artists-online" class="text-lime-500 ml-2 font-light"></h3>
+    </div>
+  </div>
+  <div
+    id="chat-log"
+    class="w-full overflow-y-auto py-4 px-2 border-[1px] border-[#333] rounded-lg bg-[#000000] h-[500px] flex flex-col-reverse"
+  ></div>
+  <form id="chat-form" action="" class="w-full">
+    <input
+      type="text"
+      placeholder="Say hello..."
+      id="chat-input"
+      class="bg-[#2c2c2c] text-sm pl-4 text-[#e3e3e3] font-light w-full h-10 mt-4 shadow-sm rounded-full"
+    />
+  </form>
+</div>
