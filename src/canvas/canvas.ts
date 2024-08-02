@@ -3,8 +3,9 @@ import { Socket } from "socket.io-client";
 import Stroke from "./stroke";
 import Paint from "../util/paint";
 import SocketHandler from "../socket-handler";
-import { Button, SocketType } from "../util/enums";
+import { Button, Page, SocketType } from "../util/enums";
 import Interface from "../interface";
+import SessionManager from "../session";
 
 export default class Canvas {
   private socket: Socket;
@@ -69,7 +70,9 @@ export default class Canvas {
     this.socket.emit("save", tag);
     this.interface.saveBtn_toggle(Button.disabled);
     this.tag = [];
-    this.clear();
+
+    SessionManager.getInstance().setPage(Page.community);
+    new Interface().updatePageUI();
   }
 
   undo() {
@@ -213,9 +216,11 @@ export default class Canvas {
   //live update websockets server with real-time paint strokes
   private publishToServer(strokeMessage: Stroke) {
     //send paint stroke to server
-    this.socket.emit("stroke", strokeMessage);
-    console.log("send");
-    //create tag to save work
-    this.tag.push(strokeMessage);
+    if (SessionManager.getInstance().getPage() == Page.canvas) {
+      this.socket.emit("stroke", strokeMessage);
+      console.log("send");
+      //create tag to save work
+      this.tag.push(strokeMessage);
+    }
   }
 }

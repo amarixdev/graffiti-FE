@@ -1,57 +1,57 @@
 <header
-class="flex justify-between items-center fixed w-full h-10 bg-[#101010] k top-0 px-5"
+  class="flex justify-between items-center fixed w-full h-10 bg-[#101010] k top-0 px-5"
 >
-<div class="flex font-thin items-center gap-2">
-  <h3  class="font-thin text-white text-sm mx-2 shadow-sm shadow-black">
-    Shortcuts
-  </h3>
-  <p class="text-white">[</p>
-  <div class="flex gap-6 text-sm">
-    <button id="color-btn-r" class="text-[#c9c9c9]">
-      <span class="font-semibold">r</span>: red
-    </button>
-    <button id="color-btn-o" class="text-[#c9c9c9]">
-      <span class="font-semibold">o</span>: orange
-    </button>
-    <button id="color-btn-y" class="text-[#c9c9c9]">
-      <span class="font-semibold">y</span>: yellow
-    </button>
-    <button id="color-btn-g" class="text-[#c9c9c9]">
-      <span class="font-semibold">g</span>: green
-    </button>
-    <button id="color-btn-b" class="text-[#c9c9c9]">
-      <span class="font-semibold">b</span>: blue
-    </button>
-    <button id="color-btn-i" class="text-[#c9c9c9]">
-      <span class="font-semibold">i</span>: indigo
-    </button>
-    <button id="color-btn-v" class="text-[#c9c9c9]">
-      <span class="font-semibold">v</span>: violet
-    </button>
-    <button id="color-btn-w" class="text-[#c9c9c9]">
-      <span class="font-semibold">w</span>: white
-    </button>
-    <button id="color-btn-k" class="text-[#c9c9c9]">
-      <span class="font-semibold">k</span>: black
-    </button>
+  <div class="flex font-thin items-center gap-2">
+    <h3 class="font-thin text-white text-sm mx-2 shadow-sm shadow-black">
+      Shortcuts
+    </h3>
+    <p class="text-white">[</p>
+    <div class="flex gap-6 text-sm">
+      <button id="color-btn-r" class="text-[#c9c9c9]">
+        <span class="font-semibold">r</span>: red
+      </button>
+      <button id="color-btn-o" class="text-[#c9c9c9]">
+        <span class="font-semibold">o</span>: orange
+      </button>
+      <button id="color-btn-y" class="text-[#c9c9c9]">
+        <span class="font-semibold">y</span>: yellow
+      </button>
+      <button id="color-btn-g" class="text-[#c9c9c9]">
+        <span class="font-semibold">g</span>: green
+      </button>
+      <button id="color-btn-b" class="text-[#c9c9c9]">
+        <span class="font-semibold">b</span>: blue
+      </button>
+      <button id="color-btn-i" class="text-[#c9c9c9]">
+        <span class="font-semibold">i</span>: indigo
+      </button>
+      <button id="color-btn-v" class="text-[#c9c9c9]">
+        <span class="font-semibold">v</span>: violet
+      </button>
+      <button id="color-btn-w" class="text-[#c9c9c9]">
+        <span class="font-semibold">w</span>: white
+      </button>
+      <button id="color-btn-k" class="text-[#c9c9c9]">
+        <span class="font-semibold">k</span>: black
+      </button>
+    </div>
+    <p class="text-white">]</p>
   </div>
-  <p class="text-white">]</p>
-</div>
+  <button id="page-toggler" class="text-white font-thin">Canvas</button>
+  <div class="flex items-center justify-between gap-5 w-[400px]">
+    <div class="flex gap-4 items-center">
+      <h1 class="text-[#f4f4f4] font-light text-sm">Color Picker</h1>
+      <input
+        type="color"
+        id="color-picker"
+        value="#FFFFFF"
+        class="opacity-100 rounded-md"
+      />
+    </div>
 
-<div class="flex items-center justify-between gap-5 w-[400px]">
-  <div class="flex gap-4 items-center">
-    <h1 class="text-[#f4f4f4] font-light text-sm">Color Picker</h1>
-    <input
-      type="color"
-      id="color-picker"
-      value="#FFFFFF"
-      class="opacity-100 rounded-md"
-    />
+    <div class="flex items-center gap-2">
+      <div class="w-2 h-2 rounded-full bg-lime-500"></div>
+      <h3 id="user-tag" class="text-white font-thin text-sm"></h3>
+    </div>
   </div>
-
-  <div class="flex items-center gap-2">
-    <div class="w-2 h-2 rounded-full bg-lime-500"></div>
-    <h3 id="user-tag" class="text-white font-thin text-sm"></h3>
-  </div>
-</div>
 </header>

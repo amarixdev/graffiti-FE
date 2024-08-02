@@ -7,3 +7,8 @@ export enum SocketType {
   user,
   remote,
 }
+
+export enum Page {
+  canvas,
+  community,
+}

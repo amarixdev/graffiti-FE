@@ -1,7 +1,8 @@
 import Canvas from "./canvas/canvas";
 import SocketHandler from "./socket-handler";
 import Paint from "./util/paint";
-import { Button } from "./util/enums";
+import { Button, Page } from "./util/enums";
+import SessionManager from "./session";
 
 export default class UserInterface {
   private colorPicker: HTMLElement | null;
@@ -9,7 +10,8 @@ export default class UserInterface {
   private saveButtonContainer: HTMLElement | null;
   private clearButton: HTMLElement | null;
   private undoButton: HTMLElement | null;
-
+  private canvasPage: HTMLElement | null;
+  private communityPage: HTMLElement | null;
   private uiButtonStyles = {
     opacity: { enabled: "100%", disabled: "25%" },
     active_scale: "active:scale-95",
@@ -22,6 +24,8 @@ export default class UserInterface {
     this.saveButtonContainer = document.getElementById("save-btn-container");
     this.clearButton = document.getElementById("clear-btn");
     this.undoButton = document.getElementById("undo-btn");
+    this.communityPage = document.getElementById("community-container");
+    this.canvasPage = document.getElementById("canvas-container");
   }
 
   setup() {
@@ -45,8 +49,53 @@ export default class UserInterface {
         canvas.setColor(Paint.values[i]);
       });
     }
+
+    const pageToggle = document.getElementById("page-toggler");
+
+    if (pageToggle) {
+      pageToggle.addEventListener("click", () => {
+        this.updatePageUI();
+      });
+    }
   }
 
+  updatePageUI() {
+    const pageToggle = document.getElementById("page-toggler");
+    const session = SessionManager.getInstance();
+    setTimeout(() => {
+      if (this.communityPage?.classList.contains("hidden")) {
+        this.displayCommunityPage();
+        session.setPage(Page.community);
+      } else {
+        this.displayCanvasPage();
+        session.setPage(Page.canvas);
+      }
+      if (pageToggle) {
+        pageToggle.innerText =
+          session.getPage() == Page.canvas ? "Canvas" : "Community";
+      }
+    }, 100);
+  }
+
+  private displayCommunityPage() {
+    if (this.canvasPage && this.communityPage) {
+      this.canvasPage?.classList.add("hidden");
+      this.saveButton?.classList.add("hidden");
+      this.undoButton?.classList.add("hidden");
+
+      this.communityPage?.classList.remove("hidden");
+    }
+  }
+
+  private displayCanvasPage() {
+    if (this.canvasPage && this.communityPage) {
+      this.canvasPage?.classList.remove("hidden");
+      this.saveButton?.classList.remove("hidden");
+      this.undoButton?.classList.remove("hidden");
+
+      this.communityPage?.classList.add("hidden");
+    }
+  }
   saveBtn_toggle(button: Button) {
     //re-initialize for HTML injection
     this.saveButton = document.getElementById("save-btn");
@@ -102,8 +151,15 @@ export default class UserInterface {
   }
 
   private saveHandler() {
-    const canvas = Canvas.getInstance();
-    canvas.save();
+    SessionManager.getInstance().setPage(Page.community);
+    Canvas.getInstance().save();
+
+    const communityGrid = document.getElementById("g-0");
+    const canvas = document.createElement("canvas");
+    canvas.style.height = "100%";
+    canvas.style.width = "100%";
+    canvas.style.background = "#c8c8c8";
+    communityGrid?.appendChild(canvas);
   }
   private undoHandler() {
     const canvas = Canvas.getInstance();
