@@ -2,10 +2,12 @@ import Interface from "./interface";
 import ChatHandler from "./live-chat";
 import SocketHandler from "./socket-handler";
 import { Page } from "./util/enums";
+import { ImagePreviews } from "./util/types";
 
 export default class SessionManager {
   private currentPage: Page = Page.canvas;
   private socketHandler: SocketHandler;
+  private tagPreviews: ImagePreviews[] = new Array();
   private static instance: SessionManager;
   private constructor() {
     console.log("session initialized");
@@ -31,6 +33,13 @@ export default class SessionManager {
 
   getPage() {
     return this.currentPage;
+  }
+  setTagPreviews(tagPreviews: ImagePreviews[]) {
+    this.tagPreviews = tagPreviews;
+  }
+  //used for rendering canvas previews
+  getTagPreviews() {
+    return this.tagPreviews;
   }
 }
 

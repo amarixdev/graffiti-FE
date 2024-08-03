@@ -3,6 +3,8 @@ import SocketHandler from "./socket-handler";
 import Paint from "./util/paint";
 import { Button, Page } from "./util/enums";
 import SessionManager from "./session";
+import CanvasDisplay from "./canvas/display";
+import { ImagePreviews } from "./util/types";
 
 export default class UserInterface {
   private colorPicker: HTMLElement | null;
@@ -45,7 +47,6 @@ export default class UserInterface {
     for (let i = 0; i < Paint.keys.length; i++) {
       const btn = document.getElementById(`color-btn-${Paint.keys[i]}`);
       btn?.addEventListener("click", () => {
-        console.log("clicked");
         canvas.setColor(Paint.values[i]);
       });
     }
@@ -152,17 +153,35 @@ export default class UserInterface {
 
   private saveHandler() {
     SessionManager.getInstance().setPage(Page.community);
-    Canvas.getInstance().save();
+    Canvas.getInstance().post();
 
-    const communityGrid = document.getElementById("g-0");
-    const canvas = document.createElement("canvas");
-    canvas.style.height = "100%";
-    canvas.style.width = "100%";
-    canvas.style.background = "#c8c8c8";
-    communityGrid?.appendChild(canvas);
+    // CanvasDisplay.getInstance();
   }
   private undoHandler() {
     const canvas = Canvas.getInstance();
     canvas.undo();
+  }
+
+  renderPreviews() {
+    const communityGrid = document.getElementById("community-grid");
+
+    const tagPreviews: ImagePreviews[] =
+      SessionManager.getInstance().getTagPreviews();
+
+    tagPreviews.forEach((preview, i) => {
+      const previewContainer = document.createElement("div");
+      //create container
+      previewContainer.id = `preview-${i}`;
+      previewContainer.style.width = "350px";
+      previewContainer.style.height = "241px";
+      previewContainer.style.border = "solid black 2px";
+      //create image
+      const img = document.createElement("img");
+      img.src = preview.imageURL;
+      img.alt = "rendered image";
+
+      previewContainer.appendChild(img);
+      communityGrid?.appendChild(previewContainer);
+    });
   }
 }

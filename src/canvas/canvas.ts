@@ -8,8 +8,10 @@ import Interface from "../interface";
 import SessionManager from "../session";
 
 export default class Canvas {
-  private socket: Socket;
   private p: p5;
+  private socket: Socket;
+  private interface: Interface = new Interface();
+
   private tag: Array<Stroke> = new Array();
   private paintStrokes: Array<Array<Stroke>> = new Array();
   private paintStroke: Array<Stroke> = new Array();
@@ -18,7 +20,6 @@ export default class Canvas {
   private weight: number = 5;
   private prevX: number = 0;
   private prevY: number = 0;
-  private interface: Interface = new Interface();
 
   private constructor(socket: Socket) {
     this.socket = socket;
@@ -65,14 +66,14 @@ export default class Canvas {
   }
 
   //send local painting to server for storage; reset current tag
-  save() {
+  post() {
     const tag = this.paintStrokes.flat();
-    this.socket.emit("save", tag);
+    this.socket.emit("save", tag, this.convertToDataURL());
     this.interface.saveBtn_toggle(Button.disabled);
     this.tag = [];
-
-    SessionManager.getInstance().setPage(Page.community);
     new Interface().updatePageUI();
+
+    this.clear();
   }
 
   undo() {
@@ -88,27 +89,27 @@ export default class Canvas {
     }
   }
 
+  private convertToDataURL(): string | undefined {
+    const canvas = document.getElementById(
+      "artist-canvas"
+    ) as HTMLCanvasElement;
+    const dataURL = canvas.toDataURL("image/png");
+    return dataURL;
+  }
+
   private init = (p: p5) => {
     const container = document.getElementById("canvas-container");
     if (container) {
       p.setup = () => {
-        p.createCanvas(container.offsetWidth, container.offsetHeight).parent(
-          container
-        );
+        const canvas = p
+          .createCanvas(container.offsetWidth, container.offsetHeight)
+          .parent(container);
+        canvas.id("artist-canvas");
         p.background(200, 200, 200);
       };
     }
 
-    // p.windowResized = () => {
-    //   const container = document.getElementById("canvas-container");
-    //   if (container) {
-    //     p.resizeCanvas(container.offsetWidth, container.offsetHeight);
-    //   }
-    // };
-
     p.draw = () => {
-      // p.translate(this.offsetX, this.offsetY);
-
       const stroke: Stroke = {
         x: p.mouseX,
         y: p.mouseY,

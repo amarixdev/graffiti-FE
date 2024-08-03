@@ -3,6 +3,10 @@ import ChatHandler from "./live-chat";
 import { SocketType } from "./util/enums";
 import Stroke from "./canvas/stroke";
 import Canvas from "./canvas/canvas";
+import CanvasDisplay from "./canvas/display";
+import SessionManager from "./session";
+import UserInterface from "./interface";
+import { ImagePreviews } from "./util/types";
 
 export default class SocketHandler {
   private constructor() {}
@@ -52,11 +56,19 @@ export default class SocketHandler {
 
     socket.on(
       "boot-up",
-      (data: Array<Stroke>, user: string, clients: number) => {
+      (
+        data: Array<Stroke>,
+        user: string,
+        clients: number,
+        tagPreviews: ImagePreviews[]
+      ) => {
         const userTag = document.getElementById("user-tag");
         const artistsOnline = document.getElementById("artists-online");
         canvas.loadCanvas(data);
-        
+        console.log(tagPreviews);
+        SessionManager.getInstance().setTagPreviews(tagPreviews);
+        new UserInterface().renderPreviews();
+
         this.sessionUsername = user;
         if (userTag && artistsOnline) {
           userTag.textContent = user;
@@ -67,6 +79,7 @@ export default class SocketHandler {
 
     socket.on("stroke", (data: Stroke) => {
       canvas.broadcast(data);
+      CanvasDisplay.getInstance().liveDisplay(data);
     });
   }
 }
