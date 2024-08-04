@@ -1,45 +1,53 @@
+import { RequestMethod, Button, Page } from "../util/enums";
+import { FetchRequests } from "../util/fetch-requests";
+import Canvas from "./canvas";
+import UInterface from "../interface";
+import SessionManager from "../session";
 import Stroke from "./stroke";
-import Paint from "../util/paint";
-import p5 from "p5";
 
 export default class CanvasFunctions {
-  spray(p: p5, stroke: Stroke): { x: number; y: number } {
-    let { x, y, px, py, size, color } = stroke;
-    let density = 50;
+  static compressAndSendToServer(method: RequestMethod) {
+    const canvas = Canvas.getInstance();
 
-    let rgb = Paint.stringToRGB(color);
+    const requestMethod = method == RequestMethod.post ? "post" : "update";
+    const artist_canvas = document.getElementById(
+      "artist-canvas"
+    ) as HTMLCanvasElement;
+    const compression = 0.0001;
+    artist_canvas.toBlob(
+      async (img) => {
+        const tag = canvas.getPaintStrokes().flat();
 
-    // Store the previous mouse position
-    if (!px || !py) {
-      px = x;
-      py = y;
+        const formData = new FormData();
+        formData.append("tag", JSON.stringify(tag));
+        formData.append("image", img!, "canvas.png"); // Append the blob with a filename
+        formData.append("method", JSON.stringify(requestMethod));
+        formData.append("id", JSON.stringify(canvas.getCanvasId()));
+
+        FetchRequests.postCanvas(formData).then((data) => {
+          console.log("Success:", data);
+          // this.paintStrokes = [];
+          canvas.setPaintStrokes([]);
+          // this.tag = [];
+          canvas.setTag([]);
+        });
+      },
+      "image/jpeg",
+      compression
+    );
+    const uInterface = new UInterface();
+    uInterface.saveBtn_toggle(Button.disabled);
+    uInterface.updatePageUI();
+    canvas.clear();
+  }
+
+  //live update websocket server with real-time paint strokes
+  static publishToServer(strokeMessage: Stroke) {
+    const canvas = Canvas.getInstance();
+    //send paint stroke to server
+    if (SessionManager.getInstance().getPage() == Page.canvas) {
+      canvas.getSocket().emit("stroke", strokeMessage);
+      console.log("send");
     }
-
-    // Calculate the distance between the current and previous positions
-    let distance = p.dist(x, y, px, py);
-    let steps = Math.ceil(distance / size);
-
-    //spray-paint effect
-    for (let i = 0; i < steps; i++) {
-      let interX = p.lerp(px, x, i / steps);
-      let interY = p.lerp(py, y, i / steps);
-
-      for (let j = 0; j < density; j++) {
-        let angle = p.random(p.TWO_PI);
-        let radius = p.random(0, 12);
-        let offsetX = p.cos(angle) * radius;
-        let offsetY = p.sin(angle) * radius;
-        let alpha = p.map(radius, 0, 12, 255, 0);
-
-        p.noStroke();
-        p.fill(rgb[0], rgb[1], rgb[2], alpha * 0.3); // Adjust opacity as needed
-        p.ellipse(interX + offsetX, interY + offsetY, size, size);
-      }
-    }
-
-    // Update the previous mouse position
-    // this.prevX = x;
-    // this.prevY = y;
-    return { x, y };
   }
 }

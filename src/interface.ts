@@ -1,7 +1,7 @@
 import Canvas from "./canvas/canvas";
 import SocketHandler from "./socket-handler";
 import Paint from "./util/paint";
-import { Button, Page, RequestMethod } from "./util/enums";
+import { Button, CanvasState, Page, RequestMethod } from "./util/enums";
 import SessionManager from "./session";
 import { ImagePreviews } from "./util/types";
 import { FetchRequests } from "./util/fetch-requests";
@@ -186,7 +186,7 @@ export default class UserInterface {
           console.log("Success:", data);
           const canvas = Canvas.getInstance();
           canvas.setCanvasId(preview.id);
-          canvas.loadCanvasFromTag(data.strokes);
+          canvas.loadCanvas(data.strokes, CanvasState.edit);
           this.updatePageUI();
         });
       });

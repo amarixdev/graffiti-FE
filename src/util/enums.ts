@@ -17,3 +17,8 @@ export enum RequestMethod {
   post,
   update,
 }
+
+export enum CanvasState {
+  new,
+  edit,
+}

@@ -72,7 +72,7 @@ export default class SocketHandler {
 
     socket.on("stroke", (data: Stroke) => {
       canvas.broadcast(data);
-      CanvasDisplay.getInstance().liveDisplay(data);
+      // CanvasDisplay.getInstance().liveDisplay(data);
     });
   }
 }

@@ -1,6 +1,7 @@
 import p5 from "p5";
 import CanvasFunctions from "./functions";
 import Stroke from "./stroke";
+import Canvas from "./canvas";
 
 // user
 // canvas-id
@@ -17,7 +18,7 @@ export default class CanvasDisplay {
     }
     return this.instance;
   }
-  
+
   private constructor(id: string) {
     this.p = new p5((p: p5) => {
       const container = document.getElementById(id);
@@ -34,7 +35,8 @@ export default class CanvasDisplay {
     });
   }
 
-  liveDisplay(stroke: Stroke) {
-    new CanvasFunctions().spray(this.p, stroke);
-  }
+  // liveDisplay(stroke: Stroke) {
+  //   const canvas = Canvas.getInstance();
+  //   canvas.spray(this.p, stroke);
+  // }
 }
