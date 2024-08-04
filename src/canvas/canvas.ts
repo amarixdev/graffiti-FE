@@ -7,6 +7,7 @@ import { Button, RequestMethod, SocketType } from "../util/enums";
 import UInterface from "../interface";
 import CanvasFunctions from "./functions";
 import { CanvasState } from "../util/enums";
+import { FetchRequests } from "../util/fetch-requests";
 export default class Canvas {
   private p: p5;
   private socket: Socket;
@@ -67,6 +68,7 @@ export default class Canvas {
 
   //recreate canvas from provided Stroke values (FIX: live / undo )
   loadCanvas(data: Array<Stroke>, state: CanvasState): void {
+    this.clear();
     data.forEach((stroke) => {
       this.spray(stroke, SocketType.remote);
     });
@@ -89,6 +91,9 @@ export default class Canvas {
 
   save(method: RequestMethod): void {
     CanvasFunctions.compressAndSendToServer(method);
+
+    //remove caching for altered canvas; needs to re-fetch updated art
+    FetchRequests.removeCache(this.canvasId);
   }
 
   getTag(): Array<Stroke> {

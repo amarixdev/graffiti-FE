@@ -75,7 +75,7 @@ export default class UserInterface {
         pageToggle.innerText =
           session.getPage() == Page.canvas ? "Canvas" : "Community";
       }
-    }, 100);
+    }, 0);
   }
 
   private displayCommunityPage() {
@@ -168,6 +168,7 @@ export default class UserInterface {
   }
 
   renderPreviews() {
+    Canvas.getInstance().clear();
     const communityGrid = document.getElementById("community-grid");
 
     const tagPreviews: ImagePreviews[] =
@@ -187,6 +188,7 @@ export default class UserInterface {
           const canvas = Canvas.getInstance();
           canvas.setCanvasId(preview.id);
           canvas.loadCanvas(data.strokes, CanvasState.edit);
+
           this.updatePageUI();
         });
       });

@@ -1,6 +1,11 @@
 export class FetchRequests {
   static PORT: number = 3000;
   static HOSTNAME: string = "localhost";
+  private static cache: Map<string, any> = new Map();
+
+  static removeCache(id: string) {
+    this.cache.delete(id);
+  }
 
   static async postCanvas(formData: FormData) {
     return await fetch(`http://${this.HOSTNAME}:${this.PORT}/post-canvas`, {
@@ -14,14 +19,32 @@ export class FetchRequests {
   }
 
   static async renderCanvas(id: string) {
-    return await fetch(`http://${this.HOSTNAME}:${this.PORT}/render-canvas`, {
-      method: "POST",
-      body: id,
-    })
-      .then((response) => response.json())
+    console.log("rendering");
+    return await this.fetchWithCache(
+      `http://${this.HOSTNAME}:${this.PORT}/render-canvas`,
+      id,
+      {
+        method: "POST",
+        body: id,
+      }
+    );
+  }
+
+  private static async fetchWithCache(url: string, id: string, options: {}) {
+    const cacheKey = id;
+    if (this.cache.has(cacheKey)) {
+      console.log(this.cache);
+      return this.cache.get(cacheKey);
+    }
+
+    return await fetch(url, options)
+      .then((response) => {
+        const json = response.json();
+        this.cache.set(cacheKey, json);
+        return json;
+      })
       .catch((err) => {
         console.error("Error:", err);
       });
   }
-
 }
