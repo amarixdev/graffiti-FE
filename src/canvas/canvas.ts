@@ -6,6 +6,8 @@ import SocketHandler from "../socket-handler";
 import { Button, Page, SocketType } from "../util/enums";
 import Interface from "../interface";
 import SessionManager from "../session";
+import html2canvas from "html2canvas";
+import { ENV } from "../env";
 
 export default class Canvas {
   private p: p5;
@@ -67,13 +69,44 @@ export default class Canvas {
 
   //send local painting to server for storage; reset current tag
   post() {
-    const tag = this.paintStrokes.flat();
-    this.socket.emit("save", tag, this.convertToDataURL());
+    this.compressAndSendToServer();
     this.interface.saveBtn_toggle(Button.disabled);
-    this.tag = [];
     new Interface().updatePageUI();
-
     this.clear();
+
+    // this.socket.emit("save", tag, this.convertToDataURL());
+  }
+
+  private compressAndSendToServer() {
+    const canvas = document.getElementById(
+      "artist-canvas"
+    ) as HTMLCanvasElement;
+    const compression = 0.0001;
+    canvas.toBlob(
+      async (img) => {
+        this.tag = this.paintStrokes.flat();
+        const formData = new FormData();
+        formData.append("tag", JSON.stringify(this.tag));
+        formData.append("image", img!, "canvas.png"); // Append the blob with a filename
+
+        fetch("http://localhost:3000/data", {
+          method: "POST",
+          body: formData,
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log("Success:", data);
+            console.log(this.tag);
+            this.paintStrokes = [];
+            this.tag = [];
+          })
+          .catch((err) => {
+            console.error("Error:", err);
+          });
+      },
+      "image/jpeg",
+      compression
+    );
   }
 
   undo() {
@@ -87,14 +120,6 @@ export default class Canvas {
     if (this.paintStrokes.length == 0) {
       this.interface.undoBtn_toggle(Button.disabled);
     }
-  }
-
-  private convertToDataURL(): string | undefined {
-    const canvas = document.getElementById(
-      "artist-canvas"
-    ) as HTMLCanvasElement;
-    const dataURL = canvas.toDataURL("image/png");
-    return dataURL;
   }
 
   private init = (p: p5) => {

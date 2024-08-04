@@ -56,19 +56,12 @@ export default class SocketHandler {
 
     socket.on(
       "boot-up",
-      (
-        data: Array<Stroke>,
-        user: string,
-        clients: number,
-        tagPreviews: ImagePreviews[]
-      ) => {
+      (user: string, clients: number, tagPreviews: ImagePreviews[]) => {
         const userTag = document.getElementById("user-tag");
         const artistsOnline = document.getElementById("artists-online");
-        canvas.loadCanvas(data);
-        console.log(tagPreviews);
         SessionManager.getInstance().setTagPreviews(tagPreviews);
         new UserInterface().renderPreviews();
-
+        
         this.sessionUsername = user;
         if (userTag && artistsOnline) {
           userTag.textContent = user;
@@ -83,3 +76,4 @@ export default class SocketHandler {
     });
   }
 }
+

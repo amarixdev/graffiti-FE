@@ -3,7 +3,6 @@ import SocketHandler from "./socket-handler";
 import Paint from "./util/paint";
 import { Button, Page } from "./util/enums";
 import SessionManager from "./session";
-import CanvasDisplay from "./canvas/display";
 import { ImagePreviews } from "./util/types";
 
 export default class UserInterface {
@@ -168,6 +167,7 @@ export default class UserInterface {
     const tagPreviews: ImagePreviews[] =
       SessionManager.getInstance().getTagPreviews();
 
+    console.log(tagPreviews);
     tagPreviews.forEach((preview, i) => {
       const previewContainer = document.createElement("div");
       //create container
@@ -175,10 +175,24 @@ export default class UserInterface {
       previewContainer.style.width = "350px";
       previewContainer.style.height = "241px";
       previewContainer.style.border = "solid black 2px";
+
       //create image
+      const arrayBuffer = preview.imageFile.buffer;
+
+      const blob = new Blob([arrayBuffer], {
+        type: preview.imageFile.mimetype,
+      });
+
+      const url = URL.createObjectURL(blob);
       const img = document.createElement("img");
-      img.src = preview.imageURL;
+      img.src = url;
       img.alt = "rendered image";
+      img.onload = () => {
+        console.log(`Image ${i} loaded successfully`);
+      };
+      img.onerror = (e) => {
+        console.error(`Error loading image ${i}`, e);
+      };
 
       previewContainer.appendChild(img);
       communityGrid?.appendChild(previewContainer);
