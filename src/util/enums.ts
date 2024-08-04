@@ -12,3 +12,8 @@ export enum Page {
   canvas,
   community,
 }
+
+export enum RequestMethod {
+  post,
+  update,
+}

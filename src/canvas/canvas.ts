@@ -3,7 +3,7 @@ import { Socket } from "socket.io-client";
 import Stroke from "./stroke";
 import Paint from "../util/paint";
 import SocketHandler from "../socket-handler";
-import { Button, Page, SocketType } from "../util/enums";
+import { Button, Page, RequestMethod, SocketType } from "../util/enums";
 import Interface from "../interface";
 import SessionManager from "../session";
 import { FetchRequests } from "../util/fetch-requests";
@@ -11,8 +11,9 @@ import { FetchRequests } from "../util/fetch-requests";
 export default class Canvas {
   private p: p5;
   private socket: Socket;
+  private canvasId: string = "";
   private interface: Interface = new Interface();
-
+  private blankCanvas: boolean = true;
   private tag: Array<Stroke> = new Array();
   private paintStrokes: Array<Array<Stroke>> = new Array();
   private paintStroke: Array<Stroke> = new Array();
@@ -36,7 +37,15 @@ export default class Canvas {
     return Canvas.instance;
   }
 
-  setColor(rgb: Array<number>) {
+  getCanvasId() {
+    return this.canvasId;
+  }
+
+  setCanvasId(id: string) {
+    this.canvasId = id;
+  }
+
+  setColor(rgb: Array<number>): void {
     const colorPicker = document.getElementById(
       "color-picker"
     ) as HTMLInputElement;
@@ -44,40 +53,51 @@ export default class Canvas {
     colorPicker.value = Paint.rgbToHex(this.color);
   }
 
-  setWeight(weight: number) {
+  setWeight(weight: number): void {
     this.weight = weight;
   }
 
   //broadcast live paint stroke from websocket server data
-  broadcast(stroke: Stroke) {
+  broadcast(stroke: Stroke): void {
     this.spray(stroke, SocketType.remote);
   }
 
-  //recreate canvas from provided Stroke values
-  loadCanvas(data: Array<Stroke>) {
+  //recreate canvas from provided Stroke values (FIX: live / undo )
+  loadCanvas(data: Array<Stroke>): void {
     data.forEach((stroke) => {
       this.spray(stroke, SocketType.remote);
     });
   }
 
+  //recreate canvas from provided Stroke values
+  loadCanvasFromTag(data: Array<Stroke>): void {
+    data.forEach((stroke) => {
+      this.spray(stroke, SocketType.remote);
+    });
+    this.paintStrokes.push(data);
+
+    //canvas is loaded from pre-existing tag; blank canvas = false
+    this.blankCanvas = false;
+  }
+
+  isBlank(): boolean {
+    return this.blankCanvas;
+  }
+
   //clear canvas pixels; reset background
-  clear() {
+  clear(): void {
     this.p.clear();
     this.p.background(200, 200, 200);
   }
 
-  //send local painting to server for storage; reset current tag
-  post() {
-    this.compressAndSendToServer();
-    this.interface.saveBtn_toggle(Button.disabled);
-    new Interface().updatePageUI();
-    this.clear();
+  save(method: RequestMethod): void {
+    this.compressAndSendToServer(method);
   }
 
-  undo() {
+  undo(): void {
     this.paintStrokes.pop();
     this.clear();
-    //TODO: <!BUG!> deleting loaded data..
+    //TODO: <!BUG!> deleting loaded data.. Also too slow, needs re-write
     this.paintStrokes.forEach((stroke) => {
       this.loadCanvas(stroke);
     });
@@ -114,7 +134,6 @@ export default class Canvas {
 
     //handles live stroke updates
     p.mouseDragged = () => {
-      //enable save button
       if (this.tag.length == 0) {
         this.interface.saveBtn_toggle(Button.enabled);
         this.interface.undoBtn_toggle(Button.enabled);
@@ -215,7 +234,8 @@ export default class Canvas {
     }
   }
 
-  private compressAndSendToServer() {
+  private compressAndSendToServer(method: RequestMethod) {
+    const requestMethod = method == RequestMethod.post ? "post" : "update";
     const canvas = document.getElementById(
       "artist-canvas"
     ) as HTMLCanvasElement;
@@ -223,9 +243,12 @@ export default class Canvas {
     canvas.toBlob(
       async (img) => {
         this.tag = this.paintStrokes.flat();
+
         const formData = new FormData();
         formData.append("tag", JSON.stringify(this.tag));
         formData.append("image", img!, "canvas.png"); // Append the blob with a filename
+        formData.append("method", JSON.stringify(requestMethod));
+        formData.append("id", JSON.stringify(this.canvasId));
 
         FetchRequests.postCanvas(formData).then((data) => {
           console.log("Success:", data);
@@ -237,5 +260,9 @@ export default class Canvas {
       "image/jpeg",
       compression
     );
+
+    this.interface.saveBtn_toggle(Button.disabled);
+    new Interface().updatePageUI();
+    this.clear();
   }
 }

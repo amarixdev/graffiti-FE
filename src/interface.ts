@@ -1,7 +1,7 @@
 import Canvas from "./canvas/canvas";
 import SocketHandler from "./socket-handler";
 import Paint from "./util/paint";
-import { Button, Page } from "./util/enums";
+import { Button, Page, RequestMethod } from "./util/enums";
 import SessionManager from "./session";
 import { ImagePreviews } from "./util/types";
 import { FetchRequests } from "./util/fetch-requests";
@@ -152,8 +152,13 @@ export default class UserInterface {
   }
 
   private saveHandler() {
+    const canvas = Canvas.getInstance();
     SessionManager.getInstance().setPage(Page.community);
-    Canvas.getInstance().post();
+    if (canvas.isBlank()) {
+      canvas.save(RequestMethod.post);
+    } else {
+      canvas.save(RequestMethod.update);
+    }
 
     // CanvasDisplay.getInstance();
   }
@@ -167,11 +172,9 @@ export default class UserInterface {
 
     const tagPreviews: ImagePreviews[] =
       SessionManager.getInstance().getTagPreviews();
-
-    console.log(tagPreviews);
     tagPreviews.forEach((preview, i) => {
-      const previewContainer = document.createElement("div");
       //create container
+      const previewContainer = document.createElement("div");
       previewContainer.id = `preview-${i}`;
       previewContainer.style.width = "350px";
       previewContainer.style.height = "191px";
@@ -181,7 +184,9 @@ export default class UserInterface {
         SessionManager.getInstance().setPage(Page.canvas);
         await FetchRequests.renderCanvas(preview.id).then((data) => {
           console.log("Success:", data);
-          Canvas.getInstance().loadCanvas(data.strokes);
+          const canvas = Canvas.getInstance();
+          canvas.setCanvasId(preview.id);
+          canvas.loadCanvasFromTag(data.strokes);
           this.updatePageUI();
         });
       });
@@ -202,7 +207,7 @@ export default class UserInterface {
       img.onerror = (e) => {
         console.error(`Error loading image ${i}`, e);
       };
-
+      //append together
       previewContainer.appendChild(img);
       communityGrid?.appendChild(previewContainer);
     });
