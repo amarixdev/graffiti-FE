@@ -1,4 +1,5 @@
 export type ImagePreviews = {
+  id: string;
   imageFile: ImageFile;
 };
 

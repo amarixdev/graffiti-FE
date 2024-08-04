@@ -4,6 +4,7 @@ import Paint from "./util/paint";
 import { Button, Page } from "./util/enums";
 import SessionManager from "./session";
 import { ImagePreviews } from "./util/types";
+import { FetchRequests } from "./util/fetch-requests";
 
 export default class UserInterface {
   private colorPicker: HTMLElement | null;
@@ -173,9 +174,17 @@ export default class UserInterface {
       //create container
       previewContainer.id = `preview-${i}`;
       previewContainer.style.width = "350px";
-      previewContainer.style.height = "241px";
+      previewContainer.style.height = "191px";
       previewContainer.style.border = "solid black 2px";
-
+      previewContainer.style.cursor = "pointer";
+      previewContainer.addEventListener("click", async () => {
+        SessionManager.getInstance().setPage(Page.canvas);
+        await FetchRequests.renderCanvas(preview.id).then((data) => {
+          console.log("Success:", data);
+          Canvas.getInstance().loadCanvas(data.strokes);
+          this.updatePageUI();
+        });
+      });
       //create image
       const arrayBuffer = preview.imageFile.buffer;
 

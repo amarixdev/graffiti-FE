@@ -6,8 +6,7 @@ import SocketHandler from "../socket-handler";
 import { Button, Page, SocketType } from "../util/enums";
 import Interface from "../interface";
 import SessionManager from "../session";
-import html2canvas from "html2canvas";
-import { ENV } from "../env";
+import { FetchRequests } from "../util/fetch-requests";
 
 export default class Canvas {
   private p: p5;
@@ -73,40 +72,6 @@ export default class Canvas {
     this.interface.saveBtn_toggle(Button.disabled);
     new Interface().updatePageUI();
     this.clear();
-
-    // this.socket.emit("save", tag, this.convertToDataURL());
-  }
-
-  private compressAndSendToServer() {
-    const canvas = document.getElementById(
-      "artist-canvas"
-    ) as HTMLCanvasElement;
-    const compression = 0.0001;
-    canvas.toBlob(
-      async (img) => {
-        this.tag = this.paintStrokes.flat();
-        const formData = new FormData();
-        formData.append("tag", JSON.stringify(this.tag));
-        formData.append("image", img!, "canvas.png"); // Append the blob with a filename
-
-        fetch("http://localhost:3000/data", {
-          method: "POST",
-          body: formData,
-        })
-          .then((response) => response.json())
-          .then((data) => {
-            console.log("Success:", data);
-            console.log(this.tag);
-            this.paintStrokes = [];
-            this.tag = [];
-          })
-          .catch((err) => {
-            console.error("Error:", err);
-          });
-      },
-      "image/jpeg",
-      compression
-    );
   }
 
   undo() {
@@ -239,7 +204,7 @@ export default class Canvas {
     this.prevY = y;
   }
 
-  //live update websockets server with real-time paint strokes
+  //live update websocket server with real-time paint strokes
   private publishToServer(strokeMessage: Stroke) {
     //send paint stroke to server
     if (SessionManager.getInstance().getPage() == Page.canvas) {
@@ -248,5 +213,29 @@ export default class Canvas {
       //create tag to save work
       this.tag.push(strokeMessage);
     }
+  }
+
+  private compressAndSendToServer() {
+    const canvas = document.getElementById(
+      "artist-canvas"
+    ) as HTMLCanvasElement;
+    const compression = 0.0001;
+    canvas.toBlob(
+      async (img) => {
+        this.tag = this.paintStrokes.flat();
+        const formData = new FormData();
+        formData.append("tag", JSON.stringify(this.tag));
+        formData.append("image", img!, "canvas.png"); // Append the blob with a filename
+
+        FetchRequests.postCanvas(formData).then((data) => {
+          console.log("Success:", data);
+          console.log(this.tag);
+          this.paintStrokes = [];
+          this.tag = [];
+        });
+      },
+      "image/jpeg",
+      compression
+    );
   }
 }
