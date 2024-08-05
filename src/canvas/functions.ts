@@ -26,9 +26,7 @@ export default class CanvasFunctions {
 
         FetchRequests.postCanvas(formData).then((data) => {
           console.log("Success:", data);
-          // this.paintStrokes = [];
           canvas.setPaintStrokes([]);
-          // this.tag = [];
           canvas.setTag([]);
         });
       },

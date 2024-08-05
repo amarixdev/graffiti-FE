@@ -1,10 +1,17 @@
 import Canvas from "./canvas/canvas";
 import SocketHandler from "./socket-handler";
 import Paint from "./util/paint";
-import { Button, CanvasState, Page, RequestMethod } from "./util/enums";
+import {
+  Button,
+  CanvasState,
+  Page,
+  Previews,
+  RequestMethod,
+} from "./util/enums";
 import SessionManager from "./session";
-import { ImagePreviews } from "./util/types";
+import { ImageFile, ImagePreview } from "./util/types";
 import { FetchRequests } from "./util/fetch-requests";
+import { randomUUID } from "crypto";
 
 export default class UserInterface {
   private colorPicker: HTMLElement | null;
@@ -20,6 +27,7 @@ export default class UserInterface {
     cursor_allowed: "cursor-not-allowed",
   };
 
+  private communityGrid: HTMLElement | null;
   constructor() {
     this.colorPicker = document.getElementById("color-picker");
     this.saveButton = document.getElementById("save-btn");
@@ -28,6 +36,7 @@ export default class UserInterface {
     this.undoButton = document.getElementById("undo-btn");
     this.communityPage = document.getElementById("community-container");
     this.canvasPage = document.getElementById("canvas-container");
+    this.communityGrid = document.getElementById("community-grid");
   }
 
   setup() {
@@ -167,51 +176,74 @@ export default class UserInterface {
     canvas.undo();
   }
 
-  renderPreviews() {
+   renderPreviews(type: Previews) {
     Canvas.getInstance().clear();
-    const communityGrid = document.getElementById("community-grid");
+    const session = SessionManager.getInstance();
+    const tagPreviews_map: Map<string, ImageFile> =
+      type == Previews.collection
+        ? session.getTagPreviews_map()
+        : session.getLastAddedPreview_();
 
-    const tagPreviews: ImagePreviews[] =
-      SessionManager.getInstance().getTagPreviews();
-    tagPreviews.forEach((preview, i) => {
-      //create container
-      const previewContainer = document.createElement("div");
-      previewContainer.id = `preview-${i}`;
-      previewContainer.style.width = "350px";
-      previewContainer.style.height = "191px";
-      previewContainer.style.border = "solid black 2px";
-      previewContainer.style.cursor = "pointer";
-      previewContainer.addEventListener("click", async () => {
-        SessionManager.getInstance().setPage(Page.canvas);
-        await FetchRequests.renderCanvas(preview.id).then((data) => {
-          console.log("Success:", data);
-          const canvas = Canvas.getInstance();
-          canvas.setCanvasId(preview.id);
-          canvas.loadCanvas(data.strokes, CanvasState.edit);
-
-          this.updatePageUI();
-        });
-      });
-      //create image
-      const arrayBuffer = preview.imageFile.buffer;
-
-      const blob = new Blob([arrayBuffer], {
-        type: preview.imageFile.mimetype,
-      });
-
-      const url = URL.createObjectURL(blob);
-      const img = document.createElement("img");
-      img.src = url;
-      img.alt = "rendered image";
-      img.onload = () => {
-        console.log(`Image ${i} loaded successfully`);
-      };
-      img.onerror = (e) => {
-        console.error(`Error loading image ${i}`, e);
-      };
-      //append together
-      previewContainer.appendChild(img);
-      communityGrid?.appendChild(previewContainer);
+    tagPreviews_map.forEach((imgFile, id) => {
+      const previewContainer = this.constructPreviewContainer(id, imgFile);
+      this.communityGrid?.appendChild(previewContainer);
     });
   }
+
+   updatePreview(preview: ImagePreview) {
+    const oldPreview = document.getElementById(`preview-${preview.id}`);
+    const updatedPreview = this.constructPreviewContainer(
+      preview.id,
+      preview.imageFile
+    );
+    oldPreview?.replaceWith(updatedPreview);
+  }
+
+  private constructPreviewContainer(
+    id: string,
+    imgFile: ImageFile
+  ): HTMLDivElement {
+    const previewContainer = document.createElement("div");
+    previewContainer.id = `preview-${id}`;
+    previewContainer.style.width = "350px";
+    previewContainer.style.height = "191px";
+    previewContainer.style.border = "solid black 2px";
+    previewContainer.style.cursor = "pointer";
+    previewContainer.addEventListener("click", async () => {
+      SessionManager.getInstance().setPage(Page.canvas);
+      await FetchRequests.renderCanvas(id).then((data) => {
+        console.log("Success:", data);
+        const canvas = Canvas.getInstance();
+        canvas.setCanvasId(id);
+        canvas.loadCanvas(data.strokes, CanvasState.edit);
+        this.updatePageUI();
+      });
+    });
+
+    //construct img
+    const arrayBuffer = imgFile.buffer;
+    const blob = new Blob([arrayBuffer], {
+      type: imgFile.mimetype,
+    });
+
+    const url = URL.createObjectURL(blob);
+    const img = document.createElement("img");
+    img.style.height = "100%";
+    img.style.width = "100%";
+    img.src = url;
+    img.alt = "rendered image";
+    img.onload = () => {
+      console.log(`Image ${id} loaded successfully`);
+    };
+    img.onerror = (e) => {
+      console.error(`Error loading image ${id}`, e);
+    };
+
+    //append img to container
+    previewContainer.appendChild(img);
+    console.log("img appended");
+
+    return previewContainer;
+  }
+
 }

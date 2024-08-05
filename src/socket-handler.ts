@@ -1,12 +1,11 @@
 import { Socket, io } from "socket.io-client";
 import ChatHandler from "./live-chat";
-import { SocketType } from "./util/enums";
+import { Previews, SocketType } from "./util/enums";
 import Stroke from "./canvas/stroke";
 import Canvas from "./canvas/canvas";
-import CanvasDisplay from "./canvas/display";
 import SessionManager from "./session";
 import UserInterface from "./interface";
-import { ImagePreviews } from "./util/types";
+import { ImageFile, ImagePreview } from "./util/types";
 
 export default class SocketHandler {
   private constructor() {}
@@ -56,12 +55,18 @@ export default class SocketHandler {
 
     socket.on(
       "boot-up",
-      (user: string, clients: number, tagPreviews: ImagePreviews[]) => {
+      (user: string, clients: number, tagPreviews: ImagePreview[]) => {
+        //convert serialized array into map
+        const preview_map = new Map<string, ImageFile>();
+        tagPreviews.forEach((preview) => {
+          preview_map.set(preview.id, preview.imageFile);
+        });
+
         const userTag = document.getElementById("user-tag");
         const artistsOnline = document.getElementById("artists-online");
-        SessionManager.getInstance().setTagPreviews(tagPreviews);
-        new UserInterface().renderPreviews();
-        
+        SessionManager.getInstance().setTagPreviews_map(preview_map);
+        new UserInterface().renderPreviews(Previews.collection);
+
         this.sessionUsername = user;
         if (userTag && artistsOnline) {
           userTag.textContent = user;
@@ -70,10 +75,22 @@ export default class SocketHandler {
       }
     );
 
+    socket.on("preview-loaded", (imagePreview: ImagePreview) => {
+      SessionManager.getInstance().insertTagPreview_map(
+        imagePreview.id,
+        imagePreview.imageFile
+      );
+
+      new UserInterface().renderPreviews(Previews.single);
+    });
+
+    socket.on("preview-updated", (imagePreview: ImagePreview) => {
+      new UserInterface().updatePreview(imagePreview);
+      console.log("preview updated");
+    });
+
     socket.on("stroke", (data: Stroke) => {
       canvas.broadcast(data);
-      // CanvasDisplay.getInstance().liveDisplay(data);
     });
   }
 }
-

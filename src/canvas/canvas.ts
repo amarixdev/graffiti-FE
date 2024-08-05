@@ -68,6 +68,7 @@ export default class Canvas {
 
   //recreate canvas from provided Stroke values (FIX: live / undo )
   loadCanvas(data: Array<Stroke>, state: CanvasState): void {
+    console.log("loading....");
     this.clear();
     data.forEach((stroke) => {
       this.spray(stroke, SocketType.remote);
@@ -91,7 +92,7 @@ export default class Canvas {
 
   save(method: RequestMethod): void {
     CanvasFunctions.compressAndSendToServer(method);
-
+    
     //remove caching for altered canvas; needs to re-fetch updated art
     FetchRequests.removeCache(this.canvasId);
   }

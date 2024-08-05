@@ -1,9 +1,9 @@
-export type ImagePreviews = {
+export type ImagePreview = {
   id: string;
   imageFile: ImageFile;
 };
 
-type ImageFile = {
+export type ImageFile = {
   filename: string;
   mimetype: string;
   size: number;

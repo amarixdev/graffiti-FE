@@ -22,3 +22,8 @@ export enum CanvasState {
   new,
   edit,
 }
+
+export enum Previews {
+  collection,
+  single,
+}

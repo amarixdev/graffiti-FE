@@ -2,16 +2,22 @@ import Interface from "./interface";
 import ChatHandler from "./live-chat";
 import SocketHandler from "./socket-handler";
 import { Page } from "./util/enums";
-import { ImagePreviews } from "./util/types";
+import { ImageFile, ImagePreview } from "./util/types";
 
 export default class SessionManager {
   private currentPage: Page = Page.canvas;
   private socketHandler: SocketHandler;
-  private tagPreviews: ImagePreviews[] = new Array();
+  private tagPreviews: Set<ImagePreview>;
+  private tagPreviews_map: Map<string, ImageFile>;
   private static instance: SessionManager;
+  private lastPreviewAddedID: string = "";
+
   private constructor() {
     console.log("session initialized");
     this.socketHandler = SocketHandler.getInstance();
+    this.tagPreviews = new Set();
+    this.tagPreviews_map = new Map();
+    console.log(this.tagPreviews);
   }
 
   static getInstance(): SessionManager {
@@ -34,12 +40,32 @@ export default class SessionManager {
   getPage() {
     return this.currentPage;
   }
-  setTagPreviews(tagPreviews: ImagePreviews[]) {
-    this.tagPreviews = tagPreviews;
+
+  setTagPreviews_map(tagPreviews: Map<string, ImageFile>) {
+    this.tagPreviews_map = tagPreviews;
   }
-  //used for rendering canvas previews
-  getTagPreviews() {
-    return this.tagPreviews;
+
+  insertTagPreview_map(id: string, imageFile: ImageFile) {
+    console.log(this.tagPreviews_map);
+    this.tagPreviews_map.set(id, imageFile);
+    this.lastPreviewAddedID = id;
+  }
+
+  getTagPreviews_map() {
+    return this.tagPreviews_map;
+  }
+
+  getLastAddedPreview_(): Map<string, ImageFile> {
+    const map = new Map();
+    map.set(
+      this.lastPreviewAddedID,
+      this.tagPreviews_map.get(this.lastPreviewAddedID)
+    );
+    return map;
+  }
+
+  deletePreview(id: string) {
+    this.tagPreviews_map.delete(id);
   }
 }
 
