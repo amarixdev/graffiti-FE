@@ -51,8 +51,6 @@ export default class SocketHandler {
       new ChatHandler().addMessage(data, SocketType.remote, user);
     });
 
-    const canvas = Canvas.getInstance();
-
     socket.on(
       "boot-up",
       (user: string, clients: number, tagPreviews: ImagePreview[]) => {
@@ -90,6 +88,7 @@ export default class SocketHandler {
     });
 
     socket.on("stroke", (data: Stroke) => {
+      const canvas = Canvas.getInstance();
       canvas.broadcast(data);
     });
   }

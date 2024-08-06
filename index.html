@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link href="src/output.css" rel="stylesheet" />
     <link href="src/chatstyles.css" rel="stylesheet" />
+    <link href="src/app.css" rel="stylesheet" />
+
     <link
       href="https://unpkg.com/css.gg@2.0.0/icons/css/undo.css"
       rel="stylesheet"
@@ -21,18 +23,27 @@
       <!-- Canvas-->
       <section
         id="canvas-container"
-        class="z-0 w-full h-full translate-y-[40px]"
-      ></section>
+        class="z-0 w-full h-full translate-y-[40px] relative"
+      >
+        <!--Logo-->
+        <!-- <footer class="absolute w-full border-2 bottom-20 flex justify-center">
+          <img
+            class="w-[400px] rounded-3xl shadow-lg shadow-black"
+            src="./public/logo-bg.png"
+            alt=""
+          />
+        </footer> -->
+      </section>
 
       <!-- Community Page  -->
       <section
         id="community-container"
-        class="w-full hidden border-red-500 border-2 translate-y-[40px]"
+        class="w-full translate-y-[40px] hidden"
       >
-        <div class="z-0 h-full bg-[#c8c8c8]">
+        <div class="z-[9999] h-full bg-gradient-to-b to-[#000] from-[#30abd0]">
           <div
             id="community-grid"
-            class="grid grid-cols-3 gap-[2px] max-h-full"
+            class="grid grid-cols-3 gap-[10px] max-h-full p-5"
           >
             <!-- <div id="g-1" class="bg-red-300"></div>
             <div id="g-2" class="bg-red-400"></div>
@@ -45,6 +56,16 @@
             <!-- More items -->
           </div>
         </div>
+        <!--Logo-->
+        <footer
+          class="absolute w-full bottom-20 flex justify-center opacity-80"
+        >
+          <img
+            class="w-[400px] rounded-3xl shadow-lg shadow-black"
+            src="./public/logo-bg.png"
+            alt=""
+          />
+        </footer>
       </section>
     </div>
 
@@ -71,6 +92,7 @@
         <p class="text-white font-medium mx-2 pr-5">Reset</p>
       </div>
     </button>
+
     <!--scripts-->
     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
     <script>

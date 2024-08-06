@@ -5,12 +5,14 @@ import { Page } from "./util/enums";
 import { ImageFile, ImagePreview } from "./util/types";
 
 export default class SessionManager {
+  private static instance: SessionManager;
+
   private currentPage: Page = Page.canvas;
   private socketHandler: SocketHandler;
   private tagPreviews: Set<ImagePreview>;
   private tagPreviews_map: Map<string, ImageFile>;
-  private static instance: SessionManager;
   private lastPreviewAddedID: string = "";
+  private artistMode: boolean = false;
 
   private constructor() {
     console.log("session initialized");
@@ -25,6 +27,14 @@ export default class SessionManager {
       SessionManager.instance = new SessionManager();
     }
     return SessionManager.instance;
+  }
+
+  isArtistMode(): boolean {
+    return this.artistMode;
+  }
+
+  setArtistMode(bool: boolean): void {
+    this.artistMode = bool;
   }
 
   setUp() {

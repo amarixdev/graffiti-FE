@@ -1,0 +1,8 @@
+.img-opacity-dim {
+  opacity: 0.85;
+}
+
+.img-opacity-dim:hover {
+  opacity: 1;
+}
+

@@ -30,7 +30,7 @@ export default class CanvasFunctions {
         }
 
         if (method == RequestMethod.update) {
-          new UInterface().updateLoader(canvasID);
+          new UInterface().renderUpdateLoader(canvasID);
         }
 
         FetchRequests.postCanvas(formData).then((data) => {

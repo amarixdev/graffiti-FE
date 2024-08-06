@@ -11,7 +11,6 @@ import {
 import SessionManager from "./session";
 import { ImageFile, ImagePreview } from "./util/types";
 import { FetchRequests } from "./util/fetch-requests";
-import { randomUUID } from "crypto";
 
 export default class UserInterface {
   private colorPicker: HTMLElement | null;
@@ -21,6 +20,8 @@ export default class UserInterface {
   private undoButton: HTMLElement | null;
   private canvasPage: HTMLElement | null;
   private communityPage: HTMLElement | null;
+  private tagButton: HTMLElement | null;
+  private artistButtons: HTMLElement | null;
   private uiButtonStyles = {
     opacity: { enabled: "100%", disabled: "25%" },
     active_scale: "active:scale-95",
@@ -37,6 +38,8 @@ export default class UserInterface {
     this.communityPage = document.getElementById("community-container");
     this.canvasPage = document.getElementById("canvas-container");
     this.communityGrid = document.getElementById("community-grid");
+    this.tagButton = document.getElementById("tag-button");
+    this.artistButtons = document.getElementById("artist-buttons");
   }
 
   setup() {
@@ -44,6 +47,11 @@ export default class UserInterface {
     this.colorPicker?.addEventListener("input", (e: Event) => {
       const target = e.target as HTMLInputElement;
       canvas.setColor(Paint.hexToRgb(target.value));
+    });
+
+    this.tagButton?.addEventListener("click", () => {
+      SessionManager.getInstance().setArtistMode(true);
+      this.updatePageUI();
     });
 
     //DEV ONLY
@@ -72,7 +80,8 @@ export default class UserInterface {
   updatePageUI() {
     const pageToggle = document.getElementById("page-toggler");
     const session = SessionManager.getInstance();
-    setTimeout(() => {
+
+    if (!session.isArtistMode()) {
       if (this.communityPage?.classList.contains("hidden")) {
         this.displayCommunityPage();
         session.setPage(Page.community);
@@ -80,11 +89,21 @@ export default class UserInterface {
         this.displayCanvasPage();
         session.setPage(Page.canvas);
       }
+
+      //DEV ONLY
       if (pageToggle) {
         pageToggle.innerText =
           session.getPage() == Page.canvas ? "Canvas" : "Community";
       }
-    }, 0);
+    }
+
+    if (session.isArtistMode()) {
+      this.artistButtons?.classList.remove("hidden");
+      this.tagButton?.classList.add("hidden");
+    } else {
+      this.artistButtons?.classList.add("hidden");
+      this.tagButton?.classList.remove("hidden");
+    }
   }
 
   private displayCommunityPage() {
@@ -163,13 +182,13 @@ export default class UserInterface {
   //event listener for posting/saving a canvas
   private saveHandler() {
     const canvas = Canvas.getInstance();
+    SessionManager.getInstance().setArtistMode(false);
     SessionManager.getInstance().setPage(Page.community);
     if (canvas.isBlank()) {
       canvas.save(RequestMethod.post);
     } else {
       canvas.save(RequestMethod.update);
     }
-
     // CanvasDisplay.getInstance();
   }
   private undoHandler() {
@@ -186,7 +205,7 @@ export default class UserInterface {
   }
 
   //render a loading view for updated canvas preview
-  updateLoader(id: string) {
+  renderUpdateLoader(id: string) {
     const oldPreview = document.getElementById(`preview-${id}`);
     const loader = document.createElement("div");
     loader.id = "loading-view";
@@ -208,7 +227,17 @@ export default class UserInterface {
       const previewContainer = this.constructContainer(id);
       const img = this.constructImage(id, imgFile);
       previewContainer.append(img);
+      previewContainer.append(this.constructPreviewUI());
+      const tagAlert = document.createElement("img");
 
+      // tagAlert.className = "tag-button";
+      // tagAlert.style.position = "absolute";
+      // tagAlert.src = "../public/tag.png";
+      // tagAlert.style.top = "20px";
+      // tagAlert.style.right = "20px";
+      // tagAlert.style.width = "120px";
+
+      previewContainer.appendChild(tagAlert);
       if (loadingView) {
         loadingView.replaceWith(previewContainer);
       }
@@ -225,7 +254,7 @@ export default class UserInterface {
       preview.imageFile
     );
     updatedPreview.append(img);
-
+    updatedPreview.append(this.constructPreviewUI());
     if (loadingView) {
       loadingView.replaceWith(updatedPreview);
     }
@@ -240,8 +269,23 @@ export default class UserInterface {
 
     const url = URL.createObjectURL(blob);
     const img = document.createElement("img");
-    img.style.height = "100%";
+    img.addEventListener("click", async () => {
+      SessionManager.getInstance().setPage(Page.canvas);
+      await FetchRequests.renderCanvas(id).then((data) => {
+        Canvas.getInstance().clear();
+        console.log("Success:", data);
+        const canvas = Canvas.getInstance();
+        canvas.setCanvasId(id);
+        canvas.loadCanvas(data.strokes, CanvasState.edit);
+        this.updatePageUI();
+        //TODO: Add a loading bar here
+      });
+    });
+
+    img.className = "img-opacity-dim";
+    img.style.cursor = "pointer";
     img.style.width = "100%";
+    // img.classList.add("rounded-md");
     img.src = url;
     img.alt = "rendered image";
     img.onload = () => {
@@ -256,21 +300,43 @@ export default class UserInterface {
   //creates the dimensions and style for the canvas preview container
   private constructContainer(id: string): HTMLDivElement {
     const previewContainer = document.createElement("div");
+
+    const styles = [
+      "shadow-black",
+      "shadow-md",
+      // "rounded-md",
+      "cursor-pointer",
+      // "bg-gradient-to-b",
+    ];
+
     previewContainer.id = `preview-${id}`;
+    previewContainer.style.position = "relative";
     previewContainer.style.width = "350px";
-    previewContainer.style.height = "191px";
-    previewContainer.style.border = "solid black 2px";
-    previewContainer.style.cursor = "pointer";
-    previewContainer.addEventListener("click", async () => {
-      SessionManager.getInstance().setPage(Page.canvas);
-      await FetchRequests.renderCanvas(id).then((data) => {
-        console.log("Success:", data);
-        const canvas = Canvas.getInstance();
-        canvas.setCanvasId(id);
-        canvas.loadCanvas(data.strokes, CanvasState.edit);
-        this.updatePageUI();
-      });
+    previewContainer.style.height = "240px";
+    previewContainer.style.padding = "10px";
+    previewContainer.style.background =
+      "linear-gradient(to bottom, #333333, #111111)";
+
+    styles.forEach((style) => {
+      previewContainer.classList.add(style);
     });
     return previewContainer;
+  }
+
+  constructPreviewUI(): HTMLDivElement {
+    const details = document.createElement("div");
+    details.style.width = "100%";
+    details.style.height = "30px";
+    details.style.marginTop = "6px";
+    details.style.display = "flex";
+    details.style.justifyContent = "center";
+    const viewArtistBtn = document.createElement("button");
+    viewArtistBtn.innerText = "View Artists";
+
+    details.appendChild(viewArtistBtn);
+    details.classList.add("font-light");
+    details.classList.add("text-sm");
+    details.classList.add("text-white");
+    return details;
   }
 }

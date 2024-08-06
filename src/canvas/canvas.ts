@@ -33,8 +33,13 @@ export default class Canvas {
   static getInstance() {
     if (!Canvas.instance) {
       Canvas.instance = new Canvas(SocketHandler.getInstance().getSocket());
+      console.log("creating instance");
     }
     return Canvas.instance;
+  }
+
+  newCanvas() {
+    this.p = new p5(this.init);
   }
 
   getCanvasId() {
@@ -92,7 +97,7 @@ export default class Canvas {
 
   save(method: RequestMethod): void {
     CanvasFunctions.compressAndSendToServer(method);
-    
+
     //remove caching for altered canvas; needs to re-fetch updated art
     FetchRequests.removeCache(this.canvasId);
   }
