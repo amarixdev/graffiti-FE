@@ -8,7 +8,7 @@ import Stroke from "./stroke";
 export default class CanvasFunctions {
   static compressAndSendToServer(method: RequestMethod) {
     const canvas = Canvas.getInstance();
-
+    const canvasID = canvas.getCanvasId();
     const requestMethod = method == RequestMethod.post ? "post" : "update";
     const artist_canvas = document.getElementById(
       "artist-canvas"
@@ -22,7 +22,16 @@ export default class CanvasFunctions {
         formData.append("tag", JSON.stringify(tag));
         formData.append("image", img!, "canvas.png"); // Append the blob with a filename
         formData.append("method", JSON.stringify(requestMethod));
-        formData.append("id", JSON.stringify(canvas.getCanvasId()));
+        formData.append("id", JSON.stringify(canvasID));
+
+        //render a loading container on new posts
+        if (method == RequestMethod.post) {
+          new UInterface().renderLoader();
+        }
+
+        if (method == RequestMethod.update) {
+          new UInterface().updateLoader(canvasID);
+        }
 
         FetchRequests.postCanvas(formData).then((data) => {
           console.log("Success:", data);
@@ -33,6 +42,7 @@ export default class CanvasFunctions {
       "image/jpeg",
       compression
     );
+
     const uInterface = new UInterface();
     uInterface.saveBtn_toggle(Button.disabled);
     uInterface.updatePageUI();

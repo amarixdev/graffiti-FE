@@ -160,6 +160,7 @@ export default class UserInterface {
     }
   }
 
+  //event listener for posting/saving a canvas
   private saveHandler() {
     const canvas = Canvas.getInstance();
     SessionManager.getInstance().setPage(Page.community);
@@ -176,7 +177,25 @@ export default class UserInterface {
     canvas.undo();
   }
 
-   renderPreviews(type: Previews) {
+  renderLoader() {
+    //render a loading view for a new canvas preview
+    const loader = document.createElement("div");
+    loader.id = "loading-view";
+    loader.innerText = "loading...";
+    this.communityGrid?.appendChild(loader);
+  }
+
+  //render a loading view for updated canvas preview
+  updateLoader(id: string) {
+    const oldPreview = document.getElementById(`preview-${id}`);
+    const loader = document.createElement("div");
+    loader.id = "loading-view";
+    loader.innerText = "loading...";
+    oldPreview?.replaceWith(loader);
+  }
+
+  //handles rendering for all newly added canvas previews; handles initial UI display
+  renderPreviews(type: Previews) {
     Canvas.getInstance().clear();
     const session = SessionManager.getInstance();
     const tagPreviews_map: Map<string, ImageFile> =
@@ -185,42 +204,35 @@ export default class UserInterface {
         : session.getLastAddedPreview_();
 
     tagPreviews_map.forEach((imgFile, id) => {
-      const previewContainer = this.constructPreviewContainer(id, imgFile);
+      const loadingView = document.getElementById("loading-view");
+      const previewContainer = this.constructContainer(id);
+      const img = this.constructImage(id, imgFile);
+      previewContainer.append(img);
+
+      if (loadingView) {
+        loadingView.replaceWith(previewContainer);
+      }
       this.communityGrid?.appendChild(previewContainer);
     });
   }
 
-   updatePreview(preview: ImagePreview) {
-    const oldPreview = document.getElementById(`preview-${preview.id}`);
-    const updatedPreview = this.constructPreviewContainer(
+  //handles updated canvas preview display
+  updatePreview(preview: ImagePreview) {
+    const loadingView = document.getElementById("loading-view");
+    let updatedPreview: HTMLDivElement = this.constructContainer(preview.id);
+    const img: HTMLImageElement = this.constructImage(
       preview.id,
       preview.imageFile
     );
-    oldPreview?.replaceWith(updatedPreview);
+    updatedPreview.append(img);
+
+    if (loadingView) {
+      loadingView.replaceWith(updatedPreview);
+    }
   }
 
-  private constructPreviewContainer(
-    id: string,
-    imgFile: ImageFile
-  ): HTMLDivElement {
-    const previewContainer = document.createElement("div");
-    previewContainer.id = `preview-${id}`;
-    previewContainer.style.width = "350px";
-    previewContainer.style.height = "191px";
-    previewContainer.style.border = "solid black 2px";
-    previewContainer.style.cursor = "pointer";
-    previewContainer.addEventListener("click", async () => {
-      SessionManager.getInstance().setPage(Page.canvas);
-      await FetchRequests.renderCanvas(id).then((data) => {
-        console.log("Success:", data);
-        const canvas = Canvas.getInstance();
-        canvas.setCanvasId(id);
-        canvas.loadCanvas(data.strokes, CanvasState.edit);
-        this.updatePageUI();
-      });
-    });
-
-    //construct img
+  //converts raw blob data into an img element
+  private constructImage(id: string, imgFile: ImageFile): HTMLImageElement {
     const arrayBuffer = imgFile.buffer;
     const blob = new Blob([arrayBuffer], {
       type: imgFile.mimetype,
@@ -238,12 +250,27 @@ export default class UserInterface {
     img.onerror = (e) => {
       console.error(`Error loading image ${id}`, e);
     };
-
-    //append img to container
-    previewContainer.appendChild(img);
-    console.log("img appended");
-
-    return previewContainer;
+    return img;
   }
 
+  //creates the dimensions and style for the canvas preview container
+  private constructContainer(id: string): HTMLDivElement {
+    const previewContainer = document.createElement("div");
+    previewContainer.id = `preview-${id}`;
+    previewContainer.style.width = "350px";
+    previewContainer.style.height = "191px";
+    previewContainer.style.border = "solid black 2px";
+    previewContainer.style.cursor = "pointer";
+    previewContainer.addEventListener("click", async () => {
+      SessionManager.getInstance().setPage(Page.canvas);
+      await FetchRequests.renderCanvas(id).then((data) => {
+        console.log("Success:", data);
+        const canvas = Canvas.getInstance();
+        canvas.setCanvasId(id);
+        canvas.loadCanvas(data.strokes, CanvasState.edit);
+        this.updatePageUI();
+      });
+    });
+    return previewContainer;
+  }
 }

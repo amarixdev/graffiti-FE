@@ -33,7 +33,7 @@ export class FetchRequests {
   private static async fetchWithCache(url: string, id: string, options: {}) {
     const cacheKey = id;
     if (this.cache.has(cacheKey)) {
-      console.log(this.cache);
+      console.log("fetching cache" + this.cache);
       return this.cache.get(cacheKey);
     }
 
