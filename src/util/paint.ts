@@ -1,15 +1,15 @@
 import Canvas from "../canvas/canvas";
 
 export default class Paint {
-  static red = [255, 0, 0];
-  static orange = [255, 127, 0];
-  static yellow = [255, 255, 0];
-  static green = [0, 255, 0];
-  static blue = [0, 0, 255];
-  static indigo = [75, 0, 130];
-  static violet = [148, 0, 211];
-  static white = [255, 255, 255];
-  static black = [0, 0, 0];
+  static red = { paint: [255, 0, 0], ui: "#d03030" };
+  static orange = { paint: [255, 127, 0], ui: "#d07330" };
+  static yellow = { paint: [255, 255, 0], ui: "#d0c530" };
+  static green = { paint: [0, 255, 0], ui: "#30d035" };
+  static blue = { paint: [0, 0, 255], ui: "#30abd0" };
+  static indigo = { paint: [75, 0, 130], ui: "#5530d0" };
+  static violet = { paint: [148, 0, 211], ui: "#a030d0" };
+  static white = { paint: [255, 255, 255], ui: "#ffffff" };
+  static black = { paint: [0, 0, 0], ui: "#202020" };
 
   static #map = {
     r: Paint.red,
@@ -27,7 +27,9 @@ export default class Paint {
   static keys: Array<string> = Object.keys(this.#map);
 
   /**Returns an array of rgb values for default colors*/
-  static values: Array<number[]> = Object.values(this.#map);
+  static values: Array<{ paint: number[]; ui: string }> = Object.values(
+    this.#map
+  );
 
   /**Converts an RGB string to an array of RGB values */
   static stringToRGB(rgbString: string): Array<number> {
@@ -69,36 +71,93 @@ export default class Paint {
 
   static colorSwitch(key: string) {
     const canvas = Canvas.getInstance();
-    switch (key) {
-      case "v":
-        canvas.setColor(this.violet);
-        break;
-      case "i":
-        canvas.setColor(this.indigo);
-        break;
-      case "b":
-        canvas.setColor(this.blue);
-        break;
-      case "g":
-        canvas.setColor(this.green);
-        break;
-      case "y":
-        canvas.setColor(this.yellow);
-        break;
-      case "o":
-        canvas.setColor(this.orange);
-        break;
-      case "r":
-        canvas.setColor(this.red);
-        break;
-      case "k":
-        canvas.setColor(this.black);
-        break;
-      case "w":
-        canvas.setColor(this.white);
-        break;
-      default:
-        return;
+    const backdrop = document.getElementById("color-backdrop");
+    if (backdrop) {
+      switch (key) {
+        case "v":
+          canvas.setColor(this.violet.paint);
+          backdrop.style.background = `linear-gradient(to bottom, ${this.violet.ui}, #000)`;
+          document.documentElement.style.setProperty(
+            "--dynamic-color",
+            this.violet.ui
+          );
+
+          break;
+        case "i":
+          canvas.setColor(this.indigo.paint);
+          backdrop.style.background = `linear-gradient(to bottom, ${Paint.indigo.ui}, #000)`;
+          document.documentElement.style.setProperty(
+            "--dynamic-color",
+            this.indigo.ui
+          );
+
+          break;
+        case "b":
+          canvas.setColor(this.blue.paint);
+          backdrop.style.background = `linear-gradient(to bottom, ${Paint.blue.ui}, #000)`;
+          document.documentElement.style.setProperty(
+            "--dynamic-color",
+            this.blue.ui
+          );
+
+          break;
+        case "g":
+          canvas.setColor(this.green.paint);
+          backdrop.style.background = `linear-gradient(to bottom, ${Paint.green.ui}, #000)`;
+          document.documentElement.style.setProperty(
+            "--dynamic-color",
+            this.green.ui
+          );
+
+          break;
+        case "y":
+          canvas.setColor(this.yellow.paint);
+          backdrop.style.background = `linear-gradient(to bottom, ${Paint.yellow.ui}, #000)`;
+          document.documentElement.style.setProperty(
+            "--dynamic-color",
+            this.yellow.ui
+          );
+
+          break;
+        case "o":
+          canvas.setColor(this.orange.paint);
+          backdrop.style.background = `linear-gradient(to bottom, ${Paint.orange.ui}, #000)`;
+          document.documentElement.style.setProperty(
+            "--dynamic-color",
+            this.orange.ui
+          );
+
+          break;
+        case "r":
+          canvas.setColor(this.red.paint);
+          backdrop.style.background = `linear-gradient(to bottom, ${Paint.red.ui}, #000)`;
+          document.documentElement.style.setProperty(
+            "--dynamic-color",
+            this.red.ui
+          );
+
+          break;
+        case "k":
+          canvas.setColor(this.black.paint);
+          backdrop.style.background = `linear-gradient(to bottom, ${Paint.black.ui}, #000)`;
+          document.documentElement.style.setProperty(
+            "--dynamic-color",
+            this.black.ui
+          );
+
+          break;
+        case "w":
+          canvas.setColor(this.white.paint);
+          backdrop.style.background = `linear-gradient(to bottom, ${Paint.white.ui}, #000)`;
+          document.documentElement.style.setProperty(
+            "--dynamic-color",
+            this.white.ui
+          );
+
+          break;
+        default:
+          return;
+      }
     }
   }
 }

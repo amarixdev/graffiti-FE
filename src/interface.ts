@@ -64,7 +64,20 @@ export default class UserInterface {
     for (let i = 0; i < Paint.keys.length; i++) {
       const btn = document.getElementById(`color-btn-${Paint.keys[i]}`);
       btn?.addEventListener("click", () => {
-        canvas.setColor(Paint.values[i]);
+        const currentPage = SessionManager.getInstance().getPage();
+        if (currentPage == Page.canvas) {
+          canvas.setColor(Paint.values[i].paint);
+        }
+        if (currentPage == Page.community) {
+          const backdrop = document.getElementById("color-backdrop");
+          if (backdrop) {
+            backdrop.style.background = `linear-gradient(to bottom, ${Paint.values[i].ui}, #000)`;
+            document.documentElement.style.setProperty(
+              "--dynamic-color",
+              Paint.values[i].ui
+            ); // Change the color to green
+          }
+        }
       });
     }
 
@@ -196,6 +209,16 @@ export default class UserInterface {
     canvas.undo();
   }
 
+  renderCanvasLoader(id: string): HTMLElement | null {
+    console.log("id:" + id);
+    const oldPreview = document.getElementById(`preview-${id}`);
+    const loader = document.createElement("span");
+    loader.id = "canvas-loader";
+    oldPreview?.replaceWith(loader);
+    console.log(oldPreview);
+    return oldPreview;
+  }
+
   renderLoader() {
     //render a loading view for a new canvas preview
     const loader = document.createElement("div");
@@ -229,13 +252,6 @@ export default class UserInterface {
       previewContainer.append(img);
       previewContainer.append(this.constructPreviewUI());
       const tagAlert = document.createElement("img");
-
-      // tagAlert.className = "tag-button";
-      // tagAlert.style.position = "absolute";
-      // tagAlert.src = "../public/tag.png";
-      // tagAlert.style.top = "20px";
-      // tagAlert.style.right = "20px";
-      // tagAlert.style.width = "120px";
 
       previewContainer.appendChild(tagAlert);
       if (loadingView) {
@@ -271,6 +287,9 @@ export default class UserInterface {
     const img = document.createElement("img");
     img.addEventListener("click", async () => {
       SessionManager.getInstance().setPage(Page.canvas);
+
+      //create loader; returns a reference to preview
+      const preview = this.renderCanvasLoader(id);
       await FetchRequests.renderCanvas(id).then((data) => {
         Canvas.getInstance().clear();
         console.log("Success:", data);
@@ -278,16 +297,20 @@ export default class UserInterface {
         canvas.setCanvasId(id);
         canvas.loadCanvas(data.strokes, CanvasState.edit);
         this.updatePageUI();
-        //TODO: Add a loading bar here
+
+        const loader = document.getElementById("canvas-loader");
+        if (preview) {
+          loader?.replaceWith(preview);
+        }
       });
     });
-
+    img.id = `img-${id}`;
     img.className = "img-opacity-dim";
     img.style.cursor = "pointer";
     img.style.width = "100%";
-    // img.classList.add("rounded-md");
     img.src = url;
     img.alt = "rendered image";
+
     img.onload = () => {
       console.log(`Image ${id} loaded successfully`);
     };

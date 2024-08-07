@@ -58,6 +58,8 @@ export default class Canvas {
     colorPicker.value = Paint.rgbToHex(this.color);
   }
 
+  
+
   setWeight(weight: number): void {
     this.weight = weight;
   }
