@@ -3,11 +3,14 @@ import { Socket } from "socket.io-client";
 import Stroke from "./stroke";
 import Paint from "../util/paint";
 import SocketHandler from "../socket-handler";
-import { Button, RequestMethod, SocketType } from "../util/enums";
+import { Button, Page, RequestMethod, SocketType } from "../util/enums";
 import UInterface from "../interface";
 import CanvasFunctions from "./functions";
 import { CanvasState } from "../util/enums";
 import { FetchRequests } from "../util/fetch-requests";
+import Worker from "./worker?worker";
+import SessionManager from "../session";
+
 export default class Canvas {
   private p: p5;
   private socket: Socket;
@@ -22,7 +25,7 @@ export default class Canvas {
   private weight: number = 5;
   private prevX: number = 0;
   private prevY: number = 0;
-
+  private bitmap: any | null = null;
   private constructor(socket: Socket) {
     this.socket = socket;
     this.p = new p5(this.init);
@@ -58,8 +61,6 @@ export default class Canvas {
     colorPicker.value = Paint.rgbToHex(this.color);
   }
 
-  
-
   setWeight(weight: number): void {
     this.weight = weight;
   }
@@ -77,9 +78,42 @@ export default class Canvas {
   loadCanvas(data: Array<Stroke>, state: CanvasState): void {
     console.log("loading....");
     this.clear();
-    data.forEach((stroke) => {
-      this.spray(stroke, SocketType.remote);
+    const worker = new Worker();
+    const canvas = new OffscreenCanvas(1200, 700);
+
+    console.log("computing");
+    let computed = data.map((stroke) => {
+      let result = this.sprayRemote(stroke);
+      return result;
     });
+
+    worker.postMessage({ computed: computed, canvas: canvas }, [canvas]);
+
+    worker.onmessage = (event) => {
+      console.log("bitmap start");
+      this.bitmap = event.data;
+      const mainCanvas = document.getElementById(
+        "artist-canvas"
+      ) as HTMLCanvasElement;
+      const ctx = mainCanvas.getContext("2d");
+
+      if (mainCanvas && ctx) {
+        // Draw the bitmap onto the main canvas
+        // ctx.clearRect(0, 0, mainCanvas.width, mainCanvas.height);
+        // ctx.drawImage(bitmap, 0, 0);
+        this.p.redraw();
+        console.log("bitmap done");
+      }
+    };
+
+    // computed.forEach((data) => {
+    //   console.log("drawing");
+    //   data.forEach((d) => {
+    //     this.p.noStroke();
+    //     this.p.fill(d.color[0], d.color[1], d.color[2], d.color[3]); // Adjust opacity as needed
+    //     this.p.ellipse(d.x, d.y, d.size, d.size);
+    //   });
+    // });
 
     if (state == CanvasState.edit) {
       this.paintStrokes.push(data);
@@ -133,6 +167,11 @@ export default class Canvas {
     }
   }
 
+  //
+  startLoop() {
+    this.p.loop();
+  }
+
   private init = (p: p5) => {
     const container = document.getElementById("canvas-container");
     if (container) {
@@ -141,11 +180,28 @@ export default class Canvas {
           .createCanvas(container.offsetWidth, container.offsetHeight)
           .parent(container);
         canvas.id("artist-canvas");
-        p.background(200, 200, 200);
+        p.background(0, 0, 0);
       };
     }
 
     p.draw = () => {
+      if (this.bitmap) {
+        // Draw the bitmap image onto the canvas
+        p.filter("blur", 10);
+        p.drawingContext.drawImage(
+          this.bitmap,
+          0,
+          0,
+          this.bitmap.width,
+          this.bitmap.height
+        );
+        this.bitmap = null;
+        console.log("done");
+        const ui = new UInterface();
+        console.log(this.canvasId);
+        ui.restorePreview();
+        ui.updatePageUI();
+      }
       const stroke: Stroke = {
         x: p.mouseX,
         y: p.mouseY,
@@ -155,6 +211,10 @@ export default class Canvas {
         size: this.weight,
       };
 
+      const artistMode = SessionManager.getInstance().isArtistMode();
+      if (!artistMode) {
+        p.noLoop();
+      }
       this.spray(stroke, SocketType.user);
     };
 
@@ -181,6 +241,47 @@ export default class Canvas {
     };
   };
 
+  private sprayRemote(stroke: Stroke) {
+    let { x, y, px, py, size, color } = stroke;
+
+    let p = this.p;
+    let density = 300;
+    let rgb = Paint.stringToRGB(color);
+    const ellipses = [];
+    // Calculate the distance between the current and previous positions
+    let distance = p.dist(x, y, px, py);
+    let steps = Math.ceil(distance / 7);
+
+    //spray-paint effect
+    for (let i = 0; i < steps; i++) {
+      let interX = p.lerp(px, x, i / steps);
+      let interY = p.lerp(py, y, i / steps);
+
+      for (let j = 0; j < density; j++) {
+        let angle = p.random(p.TWO_PI);
+        let radius = p.random(0, 10);
+        let offsetX = p.cos(angle) * radius;
+        let offsetY = p.sin(angle) * radius;
+        let alpha = p.map(radius, 0, 12, 255, 0);
+        const data = {
+          x: interX + offsetX,
+          y: interY + offsetY,
+          size: 1,
+          color: [rgb[0], rgb[1], rgb[2], alpha],
+        };
+        ellipses.push(data);
+
+        // drawEllipse();
+        // function drawEllipse() {
+        //   p.noStroke();
+        //   p.fill(rgb[0], rgb[1], rgb[2], alpha * 0.3); // Adjust opacity as needed
+        //   p.ellipse(interX + offsetX, interY + offsetY, size, size);
+        // }
+      }
+    }
+    return ellipses;
+  }
+
   private spray(stroke: Stroke, type: SocketType) {
     let { x, y, px, py, size, color } = stroke;
     let p = this.p;
@@ -188,11 +289,12 @@ export default class Canvas {
 
     let rgb = Paint.stringToRGB(color);
 
+    //~~Socket.type == user ONLY
     // Store the previous mouse position
-    if (!px || !py) {
-      px = x;
-      py = y;
-    }
+    // if (!px || !py) {
+    //   px = x;
+    //   py = y;
+    // }
 
     // Calculate the distance between the current and previous positions
     let distance = p.dist(x, y, px, py);
@@ -227,16 +329,18 @@ export default class Canvas {
             }
             break;
           case SocketType.remote:
-            drawEllipse();
+          // drawEllipse();
         }
 
         function drawEllipse() {
           p.noStroke();
-          p.fill(rgb[0], rgb[1], rgb[2], alpha * 0.3); // Adjust opacity as needed
+          p.fill(rgb[0], rgb[1], rgb[2], 0.3 * alpha); // Adjust opacity as needed
           p.ellipse(interX + offsetX, interY + offsetY, size, size);
         }
       }
     }
+
+    //(Socket.type == user) ONLY ~~~~
 
     //saves individual strokes to an array (used for undo function)
     if (this.isPainting) {

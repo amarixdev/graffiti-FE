@@ -74,6 +74,7 @@ export default class SocketHandler {
     );
 
     socket.on("preview-loaded", (imagePreview: ImagePreview) => {
+      console.log("preview loaded");
       SessionManager.getInstance().insertTagPreview_map(
         imagePreview.id,
         imagePreview.imageFile

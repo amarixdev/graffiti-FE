@@ -29,6 +29,7 @@ export default class UserInterface {
   };
 
   private communityGrid: HTMLElement | null;
+
   constructor() {
     this.colorPicker = document.getElementById("color-picker");
     this.saveButton = document.getElementById("save-btn");
@@ -51,6 +52,7 @@ export default class UserInterface {
 
     this.tagButton?.addEventListener("click", () => {
       SessionManager.getInstance().setArtistMode(true);
+      canvas.startLoop();
       this.updatePageUI();
     });
 
@@ -209,14 +211,22 @@ export default class UserInterface {
     canvas.undo();
   }
 
-  renderCanvasLoader(id: string): HTMLElement | null {
+  restorePreview() {
+    const loader = document.getElementById("canvas-loader");
+    this.constructPreviewUI();
+    const preview = SessionManager.getInstance().getPreviewRef();
+    if (preview) {
+      loader?.replaceWith(preview);
+    }
+  }
+
+  renderCanvasLoader(id: string) {
     console.log("id:" + id);
     const oldPreview = document.getElementById(`preview-${id}`);
     const loader = document.createElement("span");
     loader.id = "canvas-loader";
     oldPreview?.replaceWith(loader);
-    console.log(oldPreview);
-    return oldPreview;
+    SessionManager.getInstance().setPreviewRef(oldPreview);
   }
 
   renderLoader() {
@@ -271,9 +281,16 @@ export default class UserInterface {
     );
     updatedPreview.append(img);
     updatedPreview.append(this.constructPreviewUI());
+    console.log("loadingView: " + loadingView);
     if (loadingView) {
+      console.log("replacing");
       loadingView.replaceWith(updatedPreview);
     }
+  }
+
+  resetLoader(preview: HTMLDivElement) {
+    const loader = document.getElementById("canvas-loader");
+    loader?.replaceWith(preview);
   }
 
   //converts raw blob data into an img element
@@ -287,21 +304,21 @@ export default class UserInterface {
     const img = document.createElement("img");
     img.addEventListener("click", async () => {
       SessionManager.getInstance().setPage(Page.canvas);
-
+      //TODO: Threading research; refactor
       //create loader; returns a reference to preview
-      const preview = this.renderCanvasLoader(id);
+      this.renderCanvasLoader(id);
       await FetchRequests.renderCanvas(id).then((data) => {
         Canvas.getInstance().clear();
         console.log("Success:", data);
         const canvas = Canvas.getInstance();
         canvas.setCanvasId(id);
-        canvas.loadCanvas(data.strokes, CanvasState.edit);
-        this.updatePageUI();
 
-        const loader = document.getElementById("canvas-loader");
-        if (preview) {
-          loader?.replaceWith(preview);
-        }
+        canvas.loadCanvas(data.strokes, CanvasState.edit);
+
+        // const loader = document.getElementById("canvas-loader");
+        // if (preview) {
+        //   loader?.replaceWith(preview);
+        // }
       });
     });
     img.id = `img-${id}`;

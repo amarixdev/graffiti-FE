@@ -13,6 +13,7 @@ export default class SessionManager {
   private tagPreviews_map: Map<string, ImageFile>;
   private lastPreviewAddedID: string = "";
   private artistMode: boolean = false;
+  private previewRef: HTMLElement | null = null;
 
   private constructor() {
     console.log("session initialized");
@@ -27,6 +28,15 @@ export default class SessionManager {
       SessionManager.instance = new SessionManager();
     }
     return SessionManager.instance;
+  }
+
+  //set the ID of the canvas the user is viewing
+  setPreviewRef(ref: HTMLElement | null): void {
+    this.previewRef = ref;
+  }
+  //returns the ID of the canvas the user is viewing
+  getPreviewRef(): HTMLElement | null {
+    return this.previewRef;
   }
 
   isArtistMode(): boolean {

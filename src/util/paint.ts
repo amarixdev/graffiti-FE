@@ -9,7 +9,7 @@ export default class Paint {
   static indigo = { paint: [75, 0, 130], ui: "#5530d0" };
   static violet = { paint: [148, 0, 211], ui: "#a030d0" };
   static white = { paint: [255, 255, 255], ui: "#ffffff" };
-  static black = { paint: [0, 0, 0], ui: "#202020" };
+  static black = { paint: [0, 0, 0], ui: "#515151" };
 
   static #map = {
     r: Paint.red,
@@ -72,6 +72,10 @@ export default class Paint {
   static colorSwitch(key: string) {
     const canvas = Canvas.getInstance();
     const backdrop = document.getElementById("color-backdrop");
+    if (backdrop) {
+      backdrop.style.transition = "background-color 2s ease";
+    }
+
     if (backdrop) {
       switch (key) {
         case "v":
