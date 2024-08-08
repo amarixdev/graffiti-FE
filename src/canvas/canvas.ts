@@ -1,6 +1,6 @@
 import p5 from "p5";
 import { Socket } from "socket.io-client";
-import Stroke from "./stroke";
+import Stroke, { PaintStrokes } from "./stroke";
 import Paint from "../util/paint";
 import SocketHandler from "../socket-handler";
 import { Button, Page, RequestMethod, SocketType } from "../util/enums";
@@ -18,7 +18,7 @@ export default class Canvas {
   private interface: UInterface = new UInterface();
   private blankCanvas: boolean = true;
   private tag: Array<Stroke> = new Array();
-  private paintStrokes: Array<Array<Stroke>> = new Array();
+  private paintStrokes: PaintStrokes = new PaintStrokes();
   private paintStroke: Array<Stroke> = new Array();
   private isPainting: boolean = false;
   private color: Array<number> = [255, 255, 255];
@@ -81,12 +81,11 @@ export default class Canvas {
     const worker = new Worker();
     const canvas = new OffscreenCanvas(1200, 700);
 
-    console.log("computing");
     let computed = data.map((stroke) => {
       let result = this.sprayRemote(stroke);
       return result;
     });
-
+    console.log("sending to worker");
     worker.postMessage({ computed: computed, canvas: canvas }, [canvas]);
 
     worker.onmessage = (event) => {
@@ -99,23 +98,14 @@ export default class Canvas {
 
       if (mainCanvas && ctx) {
         // Draw the bitmap onto the main canvas
-        // ctx.clearRect(0, 0, mainCanvas.width, mainCanvas.height);
-        // ctx.drawImage(bitmap, 0, 0);
         this.p.redraw();
         console.log("bitmap done");
       }
     };
-
-    // computed.forEach((data) => {
-    //   console.log("drawing");
-    //   data.forEach((d) => {
-    //     this.p.noStroke();
-    //     this.p.fill(d.color[0], d.color[1], d.color[2], d.color[3]); // Adjust opacity as needed
-    //     this.p.ellipse(d.x, d.y, d.size, d.size);
-    //   });
-    // });
-
+    //if tagging existing canvas...
     if (state == CanvasState.edit) {
+      this.paintStrokes = new PaintStrokes();
+      this.paintStrokes.setOriginal(data);
       this.paintStrokes.push(data);
       this.blankCanvas = false;
     }
@@ -146,12 +136,12 @@ export default class Canvas {
     this.tag = tag;
   }
 
-  getPaintStrokes(): Array<Array<Stroke>> {
-    return this.paintStrokes;
+  getPaintStrokes(): Array<Stroke> {
+    return this.paintStrokes.get();
   }
 
   setPaintStrokes(paintStrokes: Stroke[][]): void {
-    this.paintStrokes = paintStrokes;
+    this.paintStrokes.set(paintStrokes);
   }
 
   undo(): void {
@@ -323,7 +313,7 @@ export default class Canvas {
               //mouse lifted, save paintStrokes
               if (this.isPainting) {
                 this.isPainting = false;
-                this.paintStrokes.push(this.paintStroke);
+                this.paintStrokes.insertNew(this.paintStroke);
                 this.paintStroke = [];
               }
             }

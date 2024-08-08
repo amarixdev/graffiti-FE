@@ -16,7 +16,7 @@ export default class CanvasFunctions {
     const compression = 0.0001;
     artist_canvas.toBlob(
       async (img) => {
-        const tag = canvas.getPaintStrokes().flat();
+        let tag = canvas.getPaintStrokes();
 
         const formData = new FormData();
         formData.append("tag", JSON.stringify(tag));

@@ -3,7 +3,7 @@ import p5 from "p5";
 self.onmessage = function (msg) {
   let { computed, canvas } = msg.data;
   const ctx = canvas.getContext("2d");
-
+  console.log("computing");
   // Perform drawing operations on the OffscreenCanvas
   computed.forEach((data: any) => {
     data.forEach((d: any) => {
@@ -16,6 +16,7 @@ self.onmessage = function (msg) {
     });
   });
 
+  console.log("converting to blov");
   // Transfer the canvas content as an ImageBitmap to the main thread
   canvas.convertToBlob().then((blob: any) => {
     createImageBitmap(blob).then((bitmap) => {
