@@ -74,6 +74,16 @@ export default class Canvas {
     this.spray(stroke, SocketType.remote);
   }
 
+  loadBitmap(bitmap: ImageBitmap) {
+    this.bitmap = bitmap;
+    this.p.redraw();
+    this.blankCanvas = false;
+    const storedPaintStrokes = localStorage.getItem(`strokes-${this.canvasId}`);
+    if (storedPaintStrokes) {
+      this.paintStrokes.setOriginal(JSON.parse(storedPaintStrokes));
+    }
+  }
+
   //recreate canvas from provided Stroke values (FIX: live / undo )
   loadCanvas(data: Array<Stroke>, state: CanvasState): void {
     console.log("loading....");
@@ -157,10 +167,41 @@ export default class Canvas {
     }
   }
 
-  //
   startLoop() {
     this.p.loop();
   }
+
+  private imageBitmapToBlob = async (bitmap: any) => {
+    // Create an OffscreenCanvas with the same dimensions as the ImageBitmap
+    const offscreenCanvas = new OffscreenCanvas(bitmap.width, bitmap.height);
+    const ctx = offscreenCanvas.getContext("2d");
+
+    // Draw the ImageBitmap onto the OffscreenCanvas
+    if (ctx) {
+      ctx.drawImage(bitmap, 0, 0);
+    }
+    // Convert the OffscreenCanvas to a Blob
+    const blob = await offscreenCanvas.convertToBlob();
+    return blob;
+  };
+
+  private storeBitmapInLocalStorage = async (
+    bitmap: ImageBitmap,
+    id: string
+  ) => {
+    const blob = await this.imageBitmapToBlob(bitmap);
+
+    const reader: any = new FileReader();
+    reader.onloadend = () => {
+      localStorage.setItem(`bitmap-${id}`, reader.result);
+      console.log(this.paintStrokes);
+      localStorage.setItem(
+        `strokes-${id}`,
+        JSON.stringify(this.paintStrokes.get())
+      );
+    };
+    reader.readAsDataURL(blob);
+  };
 
   private init = (p: p5) => {
     const container = document.getElementById("canvas-container");
@@ -174,7 +215,7 @@ export default class Canvas {
       };
     }
 
-    p.draw = () => {
+    p.draw = async () => {
       if (this.bitmap) {
         // Draw the bitmap image onto the canvas
         p.filter("blur", 10);
@@ -185,6 +226,10 @@ export default class Canvas {
           this.bitmap.width,
           this.bitmap.height
         );
+
+        const bitmap = await createImageBitmap(this.bitmap); // Assuming you have an ImageBitmap
+        await this.storeBitmapInLocalStorage(bitmap, this.canvasId);
+
         this.bitmap = null;
         console.log("done");
         const ui = new UInterface();
@@ -260,13 +305,6 @@ export default class Canvas {
           color: [rgb[0], rgb[1], rgb[2], alpha],
         };
         ellipses.push(data);
-
-        // drawEllipse();
-        // function drawEllipse() {
-        //   p.noStroke();
-        //   p.fill(rgb[0], rgb[1], rgb[2], alpha * 0.3); // Adjust opacity as needed
-        //   p.ellipse(interX + offsetX, interY + offsetY, size, size);
-        // }
       }
     }
     return ellipses;

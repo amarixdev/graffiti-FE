@@ -1,3 +1,5 @@
+import Canvas from "../canvas/canvas";
+
 export class FetchRequests {
   static PORT: number = 3000;
   static HOSTNAME: string = "localhost";
@@ -32,6 +34,24 @@ export class FetchRequests {
 
   private static async fetchWithCache(url: string, id: string, options: {}) {
     const cacheKey = id;
+    const storedBitmap = localStorage.getItem(`bitmap-${id}`);
+
+    if (storedBitmap) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => {
+          createImageBitmap(img)
+            .then((bitmap) => {
+              console.log(bitmap); // Now bitmap is in its usable form
+              resolve({ localStorage: true, bitmap: bitmap });
+            })
+            .catch(reject);
+        };
+        img.onerror = reject;
+        img.src = storedBitmap;
+      });
+    }
+
     if (this.cache.has(cacheKey)) {
       console.log("fetching cache" + this.cache);
       return this.cache.get(cacheKey);

@@ -307,20 +307,22 @@ export default class UserInterface {
       //TODO: Threading research; refactor
       //create loader; returns a reference to preview
       this.renderCanvasLoader(id);
-      await FetchRequests.renderCanvas(id).then((data) => {
+      await FetchRequests.renderCanvas(id).then((data: any) => {
         Canvas.getInstance().clear();
         console.log("Success:", data);
+
         const canvas = Canvas.getInstance();
         canvas.setCanvasId(id);
 
-        canvas.loadCanvas(data.strokes, CanvasState.edit);
-
-        // const loader = document.getElementById("canvas-loader");
-        // if (preview) {
-        //   loader?.replaceWith(preview);
-        // }
+        if (data.localStorage) {
+          console.log(data);
+          canvas.loadBitmap(data.bitmap);
+        } else {
+          canvas.loadCanvas(data.strokes, CanvasState.edit);
+        }
       });
     });
+    
     img.id = `img-${id}`;
     img.className = "img-opacity-dim";
     img.style.cursor = "pointer";

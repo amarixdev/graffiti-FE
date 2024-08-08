@@ -31,6 +31,8 @@ export default class CanvasFunctions {
 
         if (method == RequestMethod.update) {
           new UInterface().renderUpdateLoader(canvasID);
+          //remove image from localStorage when updating..
+          localStorage.removeItem(`bitmap-${canvasID}`);
         }
 
         FetchRequests.postCanvas(formData).then((data) => {
