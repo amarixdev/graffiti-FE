@@ -4,7 +4,7 @@ import { Previews, SocketType } from "./util/enums";
 import Stroke from "./canvas/stroke";
 import Canvas from "./canvas/canvas";
 import SessionManager from "./session";
-import UserInterface from "./interface";
+import UserInterface from "./interface/main";
 import { ImageFile, ImagePreview } from "./util/types";
 
 export default class SocketHandler {
@@ -31,7 +31,7 @@ export default class SocketHandler {
     return this.sessionUsername;
   }
 
-  setUpListeners() {
+  setupListeners() {
     const socket = this.socket;
     socket.on("client-connected", (data: number) => {
       const artistsOnline = document.getElementById("artists-online");

@@ -1,4 +1,4 @@
-import UserInterface from "../interface";
+import UserInterface from "../interface/main";
 import ChatHandler from "../live-chat";
 
 async function loadHTML(target: string, url: string): Promise<void> {
@@ -25,7 +25,7 @@ const HTMLContent = [
 Promise.all(HTMLContent.map((html) => loadHTML(html.id, html.src)))
   .then(() => {
     // Re-setup UI after HTML injections
-    new UserInterface().setup();
-    new ChatHandler().setup();
+    new UserInterface().setupListeners();
+    new ChatHandler().setupListeners();
   })
   .catch((error) => console.error("Error loading all HTML content:", error));

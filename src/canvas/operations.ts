@@ -1,9 +1,9 @@
 import { RequestMethod, Button, Page } from "../util/enums";
 import { FetchRequests } from "../util/fetch-requests";
 import Canvas from "./canvas";
-import UInterface from "../interface";
 import SessionManager from "../session";
 import Stroke from "./stroke";
+import UInterface from "../interface/main";
 
 export default class CanvasOperations {
   static compressAndSendToServer(method: RequestMethod) {
@@ -27,11 +27,11 @@ export default class CanvasOperations {
 
         //render a loading container on new posts
         if (method == RequestMethod.post) {
-          new UInterface().renderLoader();
+          new UInterface().display_PreviewLoader();
         }
 
         if (method == RequestMethod.update) {
-          new UInterface().renderUpdateLoader(canvasID);
+          new UInterface().display_UpdateLoader(canvasID);
           //remove image data from localStorage when updating..
           sessionStorage.removeItem(`bitmap-${canvasID}`);
           sessionStorage.removeItem(`strokes-${canvasID}`);

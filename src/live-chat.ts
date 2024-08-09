@@ -8,7 +8,7 @@ export default class ChatHandler {
   chatContainer = document.getElementById("chat-container");
   chatPreview = document.getElementById("chat-preview");
 
-  setup() {
+  setupListeners() {
     console.log("set up");
     const socket = SocketHandler.getInstance();
     this.chatForm?.addEventListener("submit", (e) => {

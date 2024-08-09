@@ -4,7 +4,7 @@ import Stroke, { PaintStrokes } from "./stroke";
 import Paint from "../util/paint";
 import SocketHandler from "../socket-handler";
 import { Button, Page, RequestMethod, SocketType } from "../util/enums";
-import UInterface from "../interface";
+import UInterface from "../interface/main";
 import CanvasOperations from "./operations";
 import { CanvasState } from "../util/enums";
 import { FetchRequests } from "../util/fetch-requests";

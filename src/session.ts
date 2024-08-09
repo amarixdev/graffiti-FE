@@ -1,4 +1,4 @@
-import Interface from "./interface";
+import Interface from "./interface/main";
 import ChatHandler from "./live-chat";
 import SocketHandler from "./socket-handler";
 import { Page } from "./util/enums";
@@ -48,9 +48,9 @@ export default class SessionManager {
   }
 
   setUp() {
-    this.socketHandler.setUpListeners();
-    new Interface().setup();
-    new ChatHandler().setup();
+    this.socketHandler.setupListeners();
+    new Interface().setupListeners();
+    new ChatHandler().setupListeners();
   }
 
   setPage(page: Page) {
