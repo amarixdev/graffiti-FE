@@ -5,10 +5,11 @@ import UInterface from "../interface";
 import SessionManager from "../session";
 import Stroke from "./stroke";
 
-export default class CanvasFunctions {
+export default class CanvasOperations {
   static compressAndSendToServer(method: RequestMethod) {
     const canvas = Canvas.getInstance();
     const canvasID = canvas.getCanvasId();
+    console.log("canvasID " + canvasID + "being sent to the server");
     const requestMethod = method == RequestMethod.post ? "post" : "update";
     const artist_canvas = document.getElementById(
       "artist-canvas"
@@ -31,8 +32,9 @@ export default class CanvasFunctions {
 
         if (method == RequestMethod.update) {
           new UInterface().renderUpdateLoader(canvasID);
-          //remove image from localStorage when updating..
-          localStorage.removeItem(`bitmap-${canvasID}`);
+          //remove image data from localStorage when updating..
+          sessionStorage.removeItem(`bitmap-${canvasID}`);
+          sessionStorage.removeItem(`strokes-${canvasID}`);
         }
 
         FetchRequests.postCanvas(formData).then((data) => {

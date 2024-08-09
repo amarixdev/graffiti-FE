@@ -34,16 +34,17 @@ export class FetchRequests {
 
   private static async fetchWithCache(url: string, id: string, options: {}) {
     const cacheKey = id;
-    const storedBitmap = localStorage.getItem(`bitmap-${id}`);
+    const storedBitmap = sessionStorage.getItem(`bitmap-${id}`);
 
     if (storedBitmap) {
+      Canvas.getInstance().setCanvasId(id);
       return new Promise((resolve, reject) => {
         const img = new Image();
         img.onload = () => {
           createImageBitmap(img)
             .then((bitmap) => {
               console.log(bitmap); // Now bitmap is in its usable form
-              resolve({ localStorage: true, bitmap: bitmap });
+              resolve({ sessionStorage: true, bitmap: bitmap });
             })
             .catch(reject);
         };

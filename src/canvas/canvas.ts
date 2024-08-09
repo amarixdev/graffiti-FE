@@ -5,11 +5,12 @@ import Paint from "../util/paint";
 import SocketHandler from "../socket-handler";
 import { Button, Page, RequestMethod, SocketType } from "../util/enums";
 import UInterface from "../interface";
-import CanvasFunctions from "./functions";
+import CanvasOperations from "./operations";
 import { CanvasState } from "../util/enums";
 import { FetchRequests } from "../util/fetch-requests";
 import Worker from "./worker?worker";
 import SessionManager from "../session";
+import LocalStorageManager from "../localStorage";
 
 export default class Canvas {
   private p: p5;
@@ -132,7 +133,7 @@ export default class Canvas {
   }
 
   save(method: RequestMethod): void {
-    CanvasFunctions.compressAndSendToServer(method);
+    CanvasOperations.compressAndSendToServer(method);
 
     //remove caching for altered canvas; needs to re-fetch updated art
     FetchRequests.removeCache(this.canvasId);
@@ -171,38 +172,6 @@ export default class Canvas {
     this.p.loop();
   }
 
-  private imageBitmapToBlob = async (bitmap: any) => {
-    // Create an OffscreenCanvas with the same dimensions as the ImageBitmap
-    const offscreenCanvas = new OffscreenCanvas(bitmap.width, bitmap.height);
-    const ctx = offscreenCanvas.getContext("2d");
-
-    // Draw the ImageBitmap onto the OffscreenCanvas
-    if (ctx) {
-      ctx.drawImage(bitmap, 0, 0);
-    }
-    // Convert the OffscreenCanvas to a Blob
-    const blob = await offscreenCanvas.convertToBlob();
-    return blob;
-  };
-
-  private storeBitmapInLocalStorage = async (
-    bitmap: ImageBitmap,
-    id: string
-  ) => {
-    const blob = await this.imageBitmapToBlob(bitmap);
-
-    const reader: any = new FileReader();
-    reader.onloadend = () => {
-      localStorage.setItem(`bitmap-${id}`, reader.result);
-      console.log(this.paintStrokes);
-      localStorage.setItem(
-        `strokes-${id}`,
-        JSON.stringify(this.paintStrokes.get())
-      );
-    };
-    reader.readAsDataURL(blob);
-  };
-
   private init = (p: p5) => {
     const container = document.getElementById("canvas-container");
     if (container) {
@@ -228,7 +197,11 @@ export default class Canvas {
         );
 
         const bitmap = await createImageBitmap(this.bitmap); // Assuming you have an ImageBitmap
-        await this.storeBitmapInLocalStorage(bitmap, this.canvasId);
+        await LocalStorageManager.getInstance().storeBitmapInLocalStorage(
+          bitmap,
+          this.canvasId,
+          this.paintStrokes.get()
+        );
 
         this.bitmap = null;
         console.log("done");
@@ -267,7 +240,7 @@ export default class Canvas {
         color: Paint.RGBToString(this.color),
         size: this.weight,
       };
-      CanvasFunctions.publishToServer(strokeMessage);
+      CanvasOperations.publishToServer(strokeMessage);
     };
 
     p.keyTyped = () => {

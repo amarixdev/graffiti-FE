@@ -50,6 +50,8 @@ export default class UserInterface {
       canvas.setColor(Paint.hexToRgb(target.value));
     });
 
+ 
+
     this.tagButton?.addEventListener("click", () => {
       SessionManager.getInstance().setArtistMode(true);
       canvas.startLoop();
@@ -60,6 +62,8 @@ export default class UserInterface {
     this.clearButton?.addEventListener("click", () => {
       SocketHandler.getInstance().getSocket().emit("clear");
       canvas.clear();
+      localStorage.clear();
+      sessionStorage.clear();
     });
 
     //header shortcut buttons
@@ -314,7 +318,7 @@ export default class UserInterface {
         const canvas = Canvas.getInstance();
         canvas.setCanvasId(id);
 
-        if (data.localStorage) {
+        if (data.sessionStorage) {
           console.log(data);
           canvas.loadBitmap(data.bitmap);
         } else {
@@ -322,7 +326,7 @@ export default class UserInterface {
         }
       });
     });
-    
+
     img.id = `img-${id}`;
     img.className = "img-opacity-dim";
     img.style.cursor = "pointer";
