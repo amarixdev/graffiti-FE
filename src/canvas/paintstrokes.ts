@@ -1,7 +1,6 @@
 export class PaintStrokes extends Array {
   private originalStrokes: Array<Stroke> = new Array();
   private newStrokes: Array<Array<Stroke>> = new Array();
-  private paintStrokes: Array<Array<Stroke>> = new Array();
   private overlapsRemoved: number = 0;
   private duplicatesRemoved: number = 0;
   setOriginal(paintStrokes: Array<Stroke>): void {
@@ -12,20 +11,17 @@ export class PaintStrokes extends Array {
     this.newStrokes.push(this.removeDuplicates(paintStrokes));
   }
 
-  set(paintStrokes: Array<Array<Stroke>>): void {
-    this.paintStrokes = paintStrokes;
-  }
-
-  insert(paintStroke: Array<Stroke>) {
-    this.paintStrokes.push(this.removeDuplicates(paintStroke));
-  }
-
   get(): Array<Stroke> {
     this.originalStrokes = this.removeOverlaps();
     const result = [...this.originalStrokes, ...this.newStrokes.flat()];
     this.debugLogger(result);
 
     return result;
+  }
+
+  reset(): void {
+    this.originalStrokes = new Array();
+    this.newStrokes = new Array();
   }
 
   private debugLogger(result: Stroke[]) {

@@ -1,5 +1,3 @@
-import p5 from "p5";
-
 self.onmessage = function (msg) {
   let { computed, canvas } = msg.data;
   const ctx = canvas.getContext("2d");

@@ -1,11 +1,11 @@
 import { Socket, io } from "socket.io-client";
 import ChatHandler from "./live-chat";
-import { Previews, SocketType } from "./util/enums";
-import Stroke from "./canvas/stroke";
-import Canvas from "./canvas/canvas";
-import SessionManager from "./session";
-import UserInterface from "./interface/main";
-import { ImageFile, ImagePreview } from "./util/types";
+import { Previews, SocketType } from "../util/enums";
+import Stroke from "../canvas/paintstrokes";
+import Canvas from "../canvas/canvas";
+import SessionManager from "../session";
+import UserInterface from "../interface/main";
+import { ImageFile, ImagePreview } from "../util/types";
 
 export default class SocketHandler {
   private constructor() {}

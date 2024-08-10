@@ -1,6 +1,6 @@
 import Interface from "./interface/main";
-import ChatHandler from "./live-chat";
-import SocketHandler from "./socket-handler";
+import ChatHandler from "./network/live-chat";
+import SocketHandler from "./network/socket-handler";
 import { Page } from "./util/enums";
 import { ImageFile, ImagePreview } from "./util/types";
 

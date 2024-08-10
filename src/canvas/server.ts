@@ -1,12 +1,12 @@
 import { RequestMethod, Button, Page } from "../util/enums";
-import { FetchRequests } from "../util/fetch-requests";
+import { FetchRequests } from "../network/fetch-requests";
 import Canvas from "./canvas";
 import SessionManager from "../session";
-import Stroke from "./stroke";
 import UInterface from "../interface/main";
 import IndexDBManager from "../storage/indexed-db";
+import Stroke from "./paintstrokes";
 
-export default class NetworkOperations {
+export default class ServerOperations {
   static compressAndSendToServer(method: RequestMethod) {
     const canvas = Canvas.getInstance();
     const canvasID = canvas.getCanvasId();
@@ -39,7 +39,7 @@ export default class NetworkOperations {
 
         FetchRequests.postCanvas(formData).then((data) => {
           console.log("Success:", data);
-          canvas.setPaintStrokes([]);
+          canvas.resetPaintStrokes();
           canvas.setTag([]);
         });
       },

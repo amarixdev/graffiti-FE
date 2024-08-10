@@ -1,5 +1,5 @@
 import UserInterface from "../interface/main";
-import ChatHandler from "../live-chat";
+import ChatHandler from "../network/live-chat";
 
 async function loadHTML(target: string, url: string): Promise<void> {
   try {

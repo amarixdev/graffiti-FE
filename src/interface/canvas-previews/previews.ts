@@ -1,7 +1,7 @@
 import Canvas from "../../canvas/canvas";
 import SessionManager from "../../session";
 import { CanvasState, Page, Previews } from "../../util/enums";
-import { FetchRequests } from "../../util/fetch-requests";
+import { FetchRequests } from "../../network/fetch-requests";
 import { ImageFile, ImagePreview } from "../../util/types";
 import PageElements from "../global/elements";
 import { LoaderConstructor } from "./loaders";
@@ -112,14 +112,15 @@ export default class PreviewConstructor {
       SessionManager.getInstance().setPage(Page.canvas);
       //create loader; returns a reference to preview
       new LoaderConstructor().display_CanvasLoader(id);
+
+      //fetch canvas from database or client storage (indexedDB)
       await FetchRequests.renderCanvas(id).then((data: any) => {
         Canvas.getInstance().clear();
+        console.log(Canvas.getInstance().getPaintStrokes());
         console.log("Success:", data);
         const canvas = Canvas.getInstance();
         canvas.setCanvasId(id);
-
-        if (data.storage) {
-          console.log(data.canvas);
+        if (data.isLocal) {
           canvas.loadBitmap(data.canvas.bitmap, data.canvas.strokes);
         } else {
           canvas.loadCanvas(data.strokes, CanvasState.edit);

@@ -1,13 +1,13 @@
 import p5 from "p5";
 import { Socket } from "socket.io-client";
-import Stroke, { PaintStrokes } from "./stroke";
+import Stroke, { PaintStrokes } from "./paintstrokes";
 import Paint from "../util/paint";
-import SocketHandler from "../socket-handler";
+import SocketHandler from "../network/socket-handler";
 import { Button, Page, RequestMethod, SocketType } from "../util/enums";
 import UInterface from "../interface/main";
-import NetworkOperations from "./network";
+import ServerOperations from "./server";
 import { CanvasState } from "../util/enums";
-import { FetchRequests } from "../util/fetch-requests";
+import { FetchRequests } from "../network/fetch-requests";
 import Worker from "./worker?worker";
 import SessionManager from "../session";
 import IndexDBManager from "../storage/indexed-db";
@@ -127,10 +127,12 @@ export default class Canvas {
   clear(): void {
     this.p.clear();
     this.p.background(200, 200, 200);
+    // this.paintStrokes = new PaintStrokes();
+    // this.paintStroke = [];
   }
 
   save(method: RequestMethod): void {
-    NetworkOperations.compressAndSendToServer(method);
+    ServerOperations.compressAndSendToServer(method);
 
     //remove caching for altered canvas; needs to re-fetch updated art
     FetchRequests.removeCache(this.canvasId);
@@ -148,8 +150,8 @@ export default class Canvas {
     return this.paintStrokes.get();
   }
 
-  setPaintStrokes(paintStrokes: Stroke[][]): void {
-    this.paintStrokes.set(paintStrokes);
+  resetPaintStrokes(): void {
+    this.paintStrokes.reset();
   }
 
   undo(): void {
@@ -242,7 +244,7 @@ export default class Canvas {
         color: Paint.RGBToString(this.color),
         size: this.weight,
       };
-      NetworkOperations.publishToServer(strokeMessage);
+      ServerOperations.publishToServer(strokeMessage);
     };
 
     p.keyTyped = () => {

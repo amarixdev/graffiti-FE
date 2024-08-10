@@ -1,6 +1,6 @@
 import Canvas from "../../canvas/canvas";
 import SessionManager from "../../session";
-import SocketHandler from "../../socket-handler";
+import SocketHandler from "../../network/socket-handler";
 import { Page } from "../../util/enums";
 import Paint from "../../util/paint";
 import PageElements from "./elements";

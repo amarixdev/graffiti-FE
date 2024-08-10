@@ -36,7 +36,7 @@ export class FetchRequests {
     const cacheKey = id;
     const storedCanvas = await IndexDBManager.getInstance().get(id);
     if (storedCanvas) {
-      return { storage: true, canvas: storedCanvas };
+      return { isLocal: true, canvas: storedCanvas };
     }
 
     if (this.cache.has(cacheKey)) {
