@@ -4,8 +4,9 @@ import Canvas from "./canvas";
 import SessionManager from "../session";
 import Stroke from "./stroke";
 import UInterface from "../interface/main";
+import IndexDBManager from "../storage/indexed-db";
 
-export default class CanvasOperations {
+export default class NetworkOperations {
   static compressAndSendToServer(method: RequestMethod) {
     const canvas = Canvas.getInstance();
     const canvasID = canvas.getCanvasId();
@@ -32,9 +33,8 @@ export default class CanvasOperations {
 
         if (method == RequestMethod.update) {
           new UInterface().display_UpdateLoader(canvasID);
-          //remove image data from localStorage when updating..
-          sessionStorage.removeItem(`bitmap-${canvasID}`);
-          sessionStorage.removeItem(`strokes-${canvasID}`);
+          //remove image data from indexDB storage when updating..
+          IndexDBManager.getInstance().remove(canvasID);
         }
 
         FetchRequests.postCanvas(formData).then((data) => {

@@ -5,12 +5,12 @@ import Paint from "../util/paint";
 import SocketHandler from "../socket-handler";
 import { Button, Page, RequestMethod, SocketType } from "../util/enums";
 import UInterface from "../interface/main";
-import CanvasOperations from "./operations";
+import NetworkOperations from "./network";
 import { CanvasState } from "../util/enums";
 import { FetchRequests } from "../util/fetch-requests";
 import Worker from "./worker?worker";
 import SessionManager from "../session";
-import LocalStorageManager from "../localStorage";
+import IndexDBManager from "../storage/indexed-db";
 
 export default class Canvas {
   private p: p5;
@@ -72,17 +72,14 @@ export default class Canvas {
 
   //broadcast live paint stroke from websocket server data
   broadcast(stroke: Stroke): void {
-    this.spray(stroke, SocketType.remote);
+    this.spray(stroke);
   }
 
-  loadBitmap(bitmap: ImageBitmap) {
+  loadBitmap(bitmap: ImageBitmap, strokes: Array<Stroke>) {
     this.bitmap = bitmap;
     this.p.redraw();
     this.blankCanvas = false;
-    const storedPaintStrokes = localStorage.getItem(`strokes-${this.canvasId}`);
-    if (storedPaintStrokes) {
-      this.paintStrokes.setOriginal(JSON.parse(storedPaintStrokes));
-    }
+    this.paintStrokes.setOriginal(strokes);
   }
 
   //recreate canvas from provided Stroke values (FIX: live / undo )
@@ -93,7 +90,7 @@ export default class Canvas {
     const canvas = new OffscreenCanvas(1200, 700);
 
     let computed = data.map((stroke) => {
-      let result = this.sprayRemote(stroke);
+      let result = this.sprayLoad(stroke);
       return result;
     });
     console.log("sending to worker");
@@ -133,7 +130,7 @@ export default class Canvas {
   }
 
   save(method: RequestMethod): void {
-    CanvasOperations.compressAndSendToServer(method);
+    NetworkOperations.compressAndSendToServer(method);
 
     //remove caching for altered canvas; needs to re-fetch updated art
     FetchRequests.removeCache(this.canvasId);
@@ -197,7 +194,13 @@ export default class Canvas {
         );
 
         const bitmap = await createImageBitmap(this.bitmap); // Assuming you have an ImageBitmap
-        await LocalStorageManager.getInstance().storeBitmapInLocalStorage(
+        // await LocalStorageManager.getInstance().storeCanvasInLocalStorage(
+        //   bitmap,
+        //   this.canvasId,
+        //   this.paintStrokes.get()
+        // );
+
+        IndexDBManager.getInstance().store(
           bitmap,
           this.canvasId,
           this.paintStrokes.get()
@@ -206,7 +209,6 @@ export default class Canvas {
         this.bitmap = null;
         console.log("done");
         const ui = new UInterface();
-        console.log(this.canvasId);
         ui.restorePreview();
         ui.updatePageUI();
       }
@@ -223,7 +225,7 @@ export default class Canvas {
       if (!artistMode) {
         p.noLoop();
       }
-      this.spray(stroke, SocketType.user);
+      this.spray(stroke);
     };
 
     //handles live stroke updates
@@ -240,7 +242,7 @@ export default class Canvas {
         color: Paint.RGBToString(this.color),
         size: this.weight,
       };
-      CanvasOperations.publishToServer(strokeMessage);
+      NetworkOperations.publishToServer(strokeMessage);
     };
 
     p.keyTyped = () => {
@@ -249,7 +251,7 @@ export default class Canvas {
     };
   };
 
-  private sprayRemote(stroke: Stroke) {
+  private sprayLoad(stroke: Stroke) {
     let { x, y, px, py, size, color } = stroke;
 
     let p = this.p;
@@ -283,14 +285,13 @@ export default class Canvas {
     return ellipses;
   }
 
-  private spray(stroke: Stroke, type: SocketType) {
+  private spray(stroke: Stroke) {
     let { x, y, px, py, size, color } = stroke;
     let p = this.p;
     let density = 50;
 
     let rgb = Paint.stringToRGB(color);
 
-    //~~Socket.type == user ONLY
     // Store the previous mouse position
     // if (!px || !py) {
     //   px = x;
@@ -313,24 +314,18 @@ export default class Canvas {
         let offsetY = p.sin(angle) * radius;
         let alpha = p.map(radius, 0, 12, 255, 0);
 
-        switch (type) {
-          case SocketType.user:
-            if (p.mouseIsPressed) {
-              drawEllipse();
-              if (!this.isPainting) {
-                this.isPainting = true;
-              }
-            } else {
-              //mouse lifted, save paintStrokes
-              if (this.isPainting) {
-                this.isPainting = false;
-                this.paintStrokes.insertNew(this.paintStroke);
-                this.paintStroke = [];
-              }
-            }
-            break;
-          case SocketType.remote:
-          // drawEllipse();
+        if (p.mouseIsPressed) {
+          drawEllipse();
+          if (!this.isPainting) {
+            this.isPainting = true;
+          }
+        } else {
+          //mouse lifted, save paintStrokes
+          if (this.isPainting) {
+            this.isPainting = false;
+            this.paintStrokes.insertNew(this.paintStroke);
+            this.paintStroke = [];
+          }
         }
 
         function drawEllipse() {

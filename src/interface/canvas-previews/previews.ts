@@ -118,9 +118,9 @@ export default class PreviewConstructor {
         const canvas = Canvas.getInstance();
         canvas.setCanvasId(id);
 
-        if (data.sessionStorage) {
-          console.log(data);
-          canvas.loadBitmap(data.bitmap);
+        if (data.storage) {
+          console.log(data.canvas);
+          canvas.loadBitmap(data.canvas.bitmap, data.canvas.strokes);
         } else {
           canvas.loadCanvas(data.strokes, CanvasState.edit);
         }

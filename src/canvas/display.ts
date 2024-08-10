@@ -1,5 +1,5 @@
 import p5 from "p5";
-import CanvasOperations from "./operations";
+import NetworkOperations from "./network";
 import Stroke from "./stroke";
 import Canvas from "./canvas";
 

@@ -88,7 +88,5 @@ export default class SessionManager {
     this.tagPreviews_map.delete(id);
   }
 }
-window.addEventListener("beforeunload", () => {
-  sessionStorage.clear();
-});
+
 SessionManager.getInstance().setUp();

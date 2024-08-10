@@ -1,4 +1,4 @@
-import Canvas from "../canvas/canvas";
+import IndexDBManager from "../storage/indexed-db";
 
 export class FetchRequests {
   static PORT: number = 3000;
@@ -34,23 +34,9 @@ export class FetchRequests {
 
   private static async fetchWithCache(url: string, id: string, options: {}) {
     const cacheKey = id;
-    const storedBitmap = sessionStorage.getItem(`bitmap-${id}`);
-
-    if (storedBitmap) {
-      Canvas.getInstance().setCanvasId(id);
-      return new Promise((resolve, reject) => {
-        const img = new Image();
-        img.onload = () => {
-          createImageBitmap(img)
-            .then((bitmap) => {
-              console.log(bitmap); // Now bitmap is in its usable form
-              resolve({ sessionStorage: true, bitmap: bitmap });
-            })
-            .catch(reject);
-        };
-        img.onerror = reject;
-        img.src = storedBitmap;
-      });
+    const storedCanvas = await IndexDBManager.getInstance().get(id);
+    if (storedCanvas) {
+      return { storage: true, canvas: storedCanvas };
     }
 
     if (this.cache.has(cacheKey)) {

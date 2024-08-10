@@ -56,7 +56,6 @@ export default class EventListeners {
       SocketHandler.getInstance().getSocket().emit("clear");
       canvas.clear();
       localStorage.clear();
-      sessionStorage.clear();
     });
   }
 
