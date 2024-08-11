@@ -2,6 +2,15 @@
   --dynamic-color: #30abd0;
 }
 
+#signature {
+  font-family: "Chalkduster", fantasy;
+}
+
+#canvas-container {
+  min-width: 62vw;
+  height: 100%;
+}
+
 #canvas-loader {
   position: relative;
   height: 200px;

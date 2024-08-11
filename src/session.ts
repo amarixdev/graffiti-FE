@@ -1,3 +1,4 @@
+import Canvas from "./canvas/canvas";
 import Interface from "./interface/main";
 import ChatHandler from "./network/live-chat";
 import SocketHandler from "./network/socket-handler";
@@ -90,3 +91,4 @@ export default class SessionManager {
 }
 
 SessionManager.getInstance().setUp();
+

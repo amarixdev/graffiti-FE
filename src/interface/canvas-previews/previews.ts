@@ -87,8 +87,8 @@ export default class PreviewConstructor {
 
     previewContainer.id = `preview-${id}`;
     previewContainer.style.position = "relative";
-    previewContainer.style.width = "350px";
-    previewContainer.style.height = "240px";
+    previewContainer.style.width = "290px";
+    previewContainer.style.height = "280px";
     previewContainer.style.padding = "10px";
     previewContainer.style.background =
       "linear-gradient(to bottom, #333333, #111111)";
@@ -112,6 +112,8 @@ export default class PreviewConstructor {
       SessionManager.getInstance().setPage(Page.canvas);
       //create loader; returns a reference to preview
       new LoaderConstructor().display_CanvasLoader(id);
+
+      //TODO: Add cursor-not-allowed and disable event listener during load
 
       //fetch canvas from database or client storage (indexedDB)
       await FetchRequests.renderCanvas(id).then((data: any) => {

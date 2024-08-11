@@ -7,6 +7,10 @@
     <link href="src/output.css" rel="stylesheet" />
     <link href="src/chatstyles.css" rel="stylesheet" />
     <link href="src/app.css" rel="stylesheet" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
 
     <link
       href="https://unpkg.com/css.gg@2.0.0/icons/css/undo.css"
@@ -15,31 +19,43 @@
     <title>Spray Chat</title>
   </head>
 
-  <body class="fixed bg-black">
-    <div class="w-screen flex h-screen">
+  <body class="bg-black">
+    <div
+      id="site-containter"
+      class="w-full flex h-screen border-red-500 border-2 pt-[40px]"
+    >
       <!-- Live Chat -->
       <section id="live-chat"></section>
 
       <!-- Canvas-->
-      <section
-        id="canvas-container"
-        class="z-0 w-full h-full translate-y-[40px] relative"
-      >
-        <!--Logo-->
-        <!-- <footer class="absolute w-full border-2 bottom-20 flex justify-center">
-          <img
-            class="w-[400px] rounded-3xl shadow-lg shadow-black"
-            src="./public/logo-bg.png"
-            alt=""
-          />
-        </footer> -->
-      </section>
+      <div id="artist-container" class="h-full w-full flex items-start">
+        <section id="canvas-container" class="z-0 relative">
+          <div
+            id="artists-screen"
+            class="transition-all z-[100] flex justify-center absolute w-full h-full border-red-500 bg-black opacity-0 bg-opacity-80 backdrop-blur-sm"
+          >
+            <div class="flex flex-col items-center justify-center gap-10 p-5">
+              <div
+                id="signature-container"
+                class="flex flex-col items-center justify-center text-2xl overflow-y-auto"
+              >
+                <p id="signature" class="text-white">crisp-ox54</p>
+              </div>
+              <h1 id="signature" class="font-light text-3xl text-[#bababa]">
+                Was here
+              </h1>
+            </div>
+          </div>
+        </section>
+        <!--Canvas Utility Buttons-->
+        <section
+          id="util-buttons"
+          class="h-full w-full border-2 border-orange-600 bg-black flex pt-4 flex-col items-center"
+        ></section>
+      </div>
 
       <!-- Community Page  -->
-      <section
-        id="community-container"
-        class="w-full translate-y-[40px] hidden"
-      >
+      <section id="community-container" class="w-full hidden">
         <div
           id="color-backdrop"
           class="z-[9999] h-full bg-gradient-to-b to-[#000] from-[#30abd0]"
@@ -48,40 +64,24 @@
           <div
             id="community-grid"
             class="grid grid-cols-3 gap-[10px] max-h-full p-5"
-          >
-            <!-- <div id="g-1" class="bg-red-300"></div>
-            <div id="g-2" class="bg-red-400"></div>
-            <div id="g-3" class="bg-red-200"></div>
-            <div id="g-4" class="bg-red-300"></div>
-            <div id="g-5" class="bg-red-400"></div>
-            <div id="g-6" class="bg-red-200"></div>
-            <div id="g-7" class="bg-red-300"></div>
-            <div id="g-8" class="bg-red-400"></div> -->
-            <!-- More items -->
-          </div>
+          ></div>
         </div>
-        <!--Logo-->
-        <!-- <footer
-          class="absolute w-full bottom-20  flex justify-center opacity-80"
+        <button
+          id="create-button"
+          class="w-[200px] flex gap-5 bottom-5 right-5 text-[#d2d2d2] hover:text-white fixed p-2 rounded-lg border-2 border-[#444] flex items-center justify-center active:scale-95 transition-all bg-black"
         >
-          <img
-            class="w-[400px] z-50 rounded-3xl shadow-lg shadow-black"
-            src="./logo-bg.png"
-            alt=""
-          />
-        </footer> -->
+          <p id="signature" class="font-light text-3xl">Create</p>
+          <i class="fa-solid fa-plus text-3xl"></i>
+        </button>
       </section>
     </div>
 
     <!--- Header -->
     <section id="header"></section>
 
-    <!--Canvas Utility Buttons-->
-    <section id="util-buttons" class=""></section>
-
     <!--Clear Button [DEV]-->
 
-    <button
+    <!-- <button
       id="clear-btn"
       class="flex px-2 active:scale-95 transition-all fixed bottom-5 right-5"
     >
@@ -95,7 +95,7 @@
       >
         <p class="text-white font-medium mx-2 pr-5">Reset</p>
       </div>
-    </button>
+    </button> -->
 
     <!--scripts-->
     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>

@@ -17,6 +17,29 @@ export default class PageElements {
   private ARTIST_BTN: HTMLElement | null =
     document.getElementById("artist-buttons");
 
+  private ARTIST_CONTAINER: HTMLElement | null =
+    document.getElementById("artist-container");
+
+  private VIEW_ARTISTS_BTN: HTMLElement | null =
+    document.getElementById("view-artists-btn");
+
+  private ARTISTS_SCREEN: HTMLElement | null =
+    document.getElementById("artists-screen");
+
+  private PREVIEW_BUTTONS: HTMLElement | null =
+    document.getElementById("preview-buttons");
+
+  artistsScreen() {
+    return this.ARTISTS_SCREEN;
+  }
+
+  previewButtons() {
+    return this.PREVIEW_BUTTONS;
+  }
+
+  viewArtistsButton() {
+    return this.VIEW_ARTISTS_BTN;
+  }
   colorPicker() {
     return this.COLOR_PICKER;
   }
@@ -48,6 +71,10 @@ export default class PageElements {
   }
   artistButtons() {
     return this.ARTIST_BTN;
+  }
+  artistContainer() {
+    console.log(this.ARTIST_CONTAINER);
+    return this.ARTIST_CONTAINER;
   }
 
   init_saveButtonContainer() {

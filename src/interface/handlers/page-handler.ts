@@ -1,3 +1,4 @@
+import Canvas from "../../canvas/canvas";
 import SessionManager from "../../session";
 import { Page } from "../../util/enums";
 import PageElements from "../global/elements";
@@ -35,18 +36,31 @@ export default class PageHandler {
   }
 
   private displayCommunityPage() {
-    if (this.elements.canvasPage() && this.elements.communityPage()) {
+    console.log(this.elements.artistContainer());
+    if (
+      this.elements.canvasPage() &&
+      this.elements.communityPage() &&
+      this.elements.artistContainer()
+    ) {
       this.elements.canvasPage()?.classList.add("hidden");
       this.elements.saveButton()?.classList.add("hidden");
       this.elements.undoButton()?.classList.add("hidden");
-
+      this.elements.artistContainer()?.classList.add("hidden");
       this.elements.communityPage()?.classList.remove("hidden");
     }
   }
 
+  private displayCanvasView() {}
+
   private displayCanvasPage() {
     if (this.elements.canvasPage() && this.elements.communityPage()) {
-      this.elements.canvasPage()?.classList.remove("hidden");
+      const canvasPage = this.elements.canvasPage();
+      const artistContainer = this.elements.artistContainer();
+      if (canvasPage && artistContainer) {
+        canvasPage.classList.remove("hidden");
+        artistContainer.classList.remove("hidden");
+      }
+
       this.elements.saveButton()?.classList.remove("hidden");
       this.elements.undoButton()?.classList.remove("hidden");
 

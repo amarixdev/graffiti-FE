@@ -63,6 +63,7 @@ export class PaintStrokes extends Array {
   }
 }
 
+
 export default class Stroke {
   x: number;
   y: number;

@@ -11,6 +11,7 @@ import { FetchRequests } from "../network/fetch-requests";
 import Worker from "./worker?worker";
 import SessionManager from "../session";
 import IndexDBManager from "../storage/indexed-db";
+import UserInterface from "../interface/main";
 
 export default class Canvas {
   private p: p5;
@@ -171,15 +172,27 @@ export default class Canvas {
     this.p.loop();
   }
 
+  resizeCanvas() {
+    const container = document.getElementById("canvas-container");
+    if (container) {
+      this.p.resizeCanvas(container.clientWidth, container.clientHeight);
+      this.p.background(200, 200, 200);
+    }
+  }
+
   private init = (p: p5) => {
     const container = document.getElementById("canvas-container");
     if (container) {
       p.setup = () => {
         const canvas = p
-          .createCanvas(container.offsetWidth, container.offsetHeight)
+          .createCanvas(container.clientWidth, container.clientHeight)
           .parent(container);
         canvas.id("artist-canvas");
-        p.background(0, 0, 0);
+        p.background(200, 200, 200);
+      };
+
+      p.windowResized = () => {
+        this.resizeCanvas();
       };
     }
 
@@ -196,11 +209,6 @@ export default class Canvas {
         );
 
         const bitmap = await createImageBitmap(this.bitmap); // Assuming you have an ImageBitmap
-        // await LocalStorageManager.getInstance().storeCanvasInLocalStorage(
-        //   bitmap,
-        //   this.canvasId,
-        //   this.paintStrokes.get()
-        // );
 
         IndexDBManager.getInstance().store(
           bitmap,
@@ -249,7 +257,8 @@ export default class Canvas {
 
     p.keyTyped = () => {
       let key = p.key;
-      Paint.colorSwitch(key);
+      Paint.colorSwitch(key, "color-backdrop");
+      Paint.colorSwitch(key, "artist-container");
     };
   };
 

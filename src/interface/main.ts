@@ -23,11 +23,13 @@ export default class UserInterface {
   }
   /*establish initial event listeners*/
   setupListeners(): void {
-    this.listeners.listenColorPicker_Button();
+    this.listeners.listenColorPicker_Button("color-backdrop");
+    this.listeners.listenColorPicker_Button("artist-container");
     this.listeners.listenColorPicker_KeyPress();
     this.listeners.listenTagButton();
     this.listeners.listenClearButton();
     this.listeners.listenPageToggle();
+    this.listeners.listenViewArtists_Button();
   }
 
   updatePageUI(): void {

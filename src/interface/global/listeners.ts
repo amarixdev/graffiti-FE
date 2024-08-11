@@ -9,6 +9,14 @@ import UserInterface from "../main";
 export default class EventListeners {
   private elements = new PageElements();
 
+  listenViewArtists_Button() {
+    this.elements.viewArtistsButton()?.addEventListener("click", () => {
+      console.log("clicked");
+      const artistsScreen = this.elements.artistsScreen();
+      if (artistsScreen) artistsScreen.classList.toggle("opacity-0");
+    });
+  }
+
   listenColorPicker_KeyPress() {
     const canvas = Canvas.getInstance();
     this.elements.colorPicker()?.addEventListener("input", (e: Event) => {
@@ -17,17 +25,18 @@ export default class EventListeners {
     });
   }
 
-  listenColorPicker_Button() {
+  listenColorPicker_Button(elementID: string) {
     const canvas = Canvas.getInstance();
     for (let i = 0; i < Paint.keys.length; i++) {
       const btn = document.getElementById(`color-btn-${Paint.keys[i]}`);
       btn?.addEventListener("click", () => {
-        const currentPage = SessionManager.getInstance().getPage();
-        if (currentPage == Page.canvas) {
+        const artistMode = SessionManager.getInstance().isArtistMode();
+        console.log(artistMode);
+        if (artistMode) {
           canvas.setColor(Paint.values[i].paint);
         }
-        if (currentPage == Page.community) {
-          const backdrop = document.getElementById("color-backdrop");
+        if (!artistMode) {
+          const backdrop = document.getElementById(elementID);
           if (backdrop) {
             backdrop.style.background = `linear-gradient(to bottom, ${Paint.values[i].ui}, #000)`;
             document.documentElement.style.setProperty(
@@ -42,7 +51,12 @@ export default class EventListeners {
 
   listenTagButton() {
     const canvas = Canvas.getInstance();
+
     this.elements.tagButton()?.addEventListener("click", () => {
+      const viewArtistBtn = this.elements.viewArtistsButton();
+      if (viewArtistBtn) {
+        viewArtistBtn.style.visibility = "hidden";
+      }
       SessionManager.getInstance().setArtistMode(true);
       canvas.startLoop();
       new UserInterface().updatePageUI();

@@ -1,4 +1,6 @@
+import { Session } from "inspector";
 import Canvas from "../canvas/canvas";
+import SessionManager from "../session";
 
 export default class Paint {
   static red = { paint: [255, 0, 0], ui: "#d03030" };
@@ -69,14 +71,14 @@ export default class Paint {
     return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
   }
 
-  static colorSwitch(key: string) {
+  static colorSwitch(key: string, elementID: string) {
     const canvas = Canvas.getInstance();
-    const backdrop = document.getElementById("color-backdrop");
+    const backdrop = document.getElementById(elementID);
     if (backdrop) {
       backdrop.style.transition = "background-color 2s ease";
     }
 
-    if (backdrop) {
+    if (backdrop ) {
       switch (key) {
         case "v":
           canvas.setColor(this.violet.paint);

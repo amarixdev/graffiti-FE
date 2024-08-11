@@ -1,14 +1,13 @@
-<section class="fixed top-14 right-4 flex flex-col gap-3 items-center">
-  <div id="artist-buttons" class="hidden flex px-2 flex-col gap-5 justify-end">
-    <div id="save-btn-container" class="flex justify-center items-center">
-      <div
-        class="mr-6 px-3 py-1 rounded-md bg-[#242424] h-fit border-[2px] border-[#4d4d4d] w-[150px] absolute text-xs font-semibold opacity-0 -translate-x-28 group-hover:opacity-80 transition-opacity ease-in"
-      >
-        <p class="text-white font-light">Save your art to the canvas.</p>
-      </div>
+<section class="flex flex-col gap-3 relative z-[100] w-fit h-full">
+  <!--Artist mode-->
+  <div
+    id="artist-buttons"
+    class="hidden flex px-2 flex-col gap-5 border-2 border-green-500 items-center"
+  >
+    <div id="save-btn-container" class="w-fit">
       <button
         id="save-btn"
-        class="shadow-sm transition-all opacity-25 cursor-not-allowed rounded-full shadow-black flex items-center justify-center z-10 w-14 h-14 bg-black text-white"
+        class="shadow-sm transition-all opacity-25 cursor-not-allowed rounded-full shadow-black flex items-center justify-center z-10 w-14 h-14 bg-[#333333] text-white"
       >
         <p class="text-white font-thin text-4xl -translate-y-[2px]">+</p>
       </button>
@@ -19,13 +18,73 @@
     >
       <i class="gg-undo text-lg"></i>
     </button>
+    <button
+      id="eraser-btn"
+      class="shadow-sm active:scale-95 transition-all rounded-full shadow-black flex items-center justify-center z-10 w-14 h-14 bg-[#1bc5d4] text-white"
+    >
+      <i class="fa-solid fa-eraser text-lg"></i>
+    </button>
   </div>
 
   <!--Tag Button-->
-  <button
-    id="tag-button"
-    class="w-[180px] h-[60px] flex items-center justify-center active:scale-95 transition-all"
-  >
-    <img src="../tag.png" alt="tag-button" class="" />
-  </button>
+  <div class="flex flex-col justify-between py-4 h-full">
+    <div class="flex flex-col gap-10">
+      <button
+        id="tag-button"
+        class="w-[130px] p-2 rounded-lg border-2 border-[#444] flex items-center justify-center active:scale-95 transition-all bg-black"
+      >
+        <p
+          id="signature"
+          class="font-light text-xl text-[#d2d2d2] hover:text-white"
+        >
+          Tag it!
+        </p>
+      </button>
+
+      <button
+        id="view-artists-btn"
+        class="w-[130px] p-1 rounded-lg border-2 border-[#444] flex items-center justify-center active:scale-95 transition-all bg-black"
+      >
+        <p
+          id="signature"
+          class="font-light text-xl text-[#d2d2d2] hover:text-white"
+        >
+          View Artists
+        </p>
+      </button>
+      <button
+        id="create-button"
+        class="w-[130px] p-1 rounded-lg border-2 border-[#444] flex items-center justify-center active:scale-95 transition-all bg-black"
+      >
+        <p
+          id="signature"
+          class="font-light text-xl text-[#d2d2d2] hover:text-white"
+        >
+          Create New
+        </p>
+      </button>
+    </div>
+    <button
+      id="clear-btn"
+      class="w-[130px] rounded-lg border-2 border-[#444] flex items-center justify-center active:scale-95 transition-all bg-red-400"
+    >
+      <p
+        id="signature"
+        class="font-light text-xl text-[#d2d2d2] hover:text-white"
+      >
+        RESET
+      </p>
+    </button>
+    <button
+      id="back-button"
+      class="w-[130px] rounded-lg border-2 border-[#444] flex items-center justify-center active:scale-95 transition-all bg-blue-400"
+    >
+      <p
+        id="signature"
+        class="font-light text-xl text-[#d2d2d2] hover:text-white"
+      >
+        Back
+      </p>
+    </button>
+  </div>
 </section>
