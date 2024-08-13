@@ -16,24 +16,19 @@ export default class PageElements {
   private TAG_BTN: HTMLElement | null = document.getElementById("tag-button");
   private ARTIST_BTN: HTMLElement | null =
     document.getElementById("artist-buttons");
-
   private CANVAS_PAGE: HTMLElement | null =
     document.getElementById("canvas-page");
-
   private VIEW_ARTISTS_BTN: HTMLElement | null =
     document.getElementById("view-artists-btn");
-
   private ARTISTS_SCREEN: HTMLElement | null =
     document.getElementById("artists-screen");
-
   private PREVIEW_BUTTONS: HTMLElement | null =
     document.getElementById("preview-buttons");
-
   private CREATE_BUTTON: HTMLElement | null =
     document.getElementById("create-btn");
-
   private BACK_BUTTON: HTMLElement | null = document.getElementById("back-btn");
-
+  private GENERATE_USER: HTMLElement | null =
+    document.getElementById("generate-username");
   artistsScreen() {
     return this.ARTISTS_SCREEN;
   }
@@ -44,6 +39,10 @@ export default class PageElements {
 
   createButton() {
     return this.CREATE_BUTTON;
+  }
+
+  generateUserButton() {
+    return this.GENERATE_USER;
   }
 
   previewButtons() {

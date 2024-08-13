@@ -21,6 +21,7 @@ export default class UserInterface {
     this.previewConstructor = new PreviewConstructor();
     this.loaderConstructor = new LoaderConstructor();
   }
+
   /*establish initial event listeners*/
   setupListeners(): void {
     this.listeners.listenColorPicker_Button("color-backdrop");
@@ -32,6 +33,8 @@ export default class UserInterface {
     this.listeners.listenViewArtists_Button();
     this.listeners.listenCreate_Button();
     this.listeners.listenBack_Button();
+    this.listeners.listenGenerateUser();
+    this.listeners.listenCustomizeUser();
   }
 
   updatePage(): void {
@@ -51,12 +54,12 @@ export default class UserInterface {
   }
 
   display_PreviewLoader(): void {
-    this.loaderConstructor.display_Loader(null);
+    this.loaderConstructor.display_PreviewLoader(null);
   }
 
   //render a loading view for updated canvas preview
   display_UpdateLoader(id: string): void {
-    this.loaderConstructor.display_Loader(id);
+    this.loaderConstructor.display_PreviewLoader(id);
   }
 
   //handles rendering for all newly added canvas previews; handles initial UI display

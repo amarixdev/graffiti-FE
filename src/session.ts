@@ -50,8 +50,6 @@ export default class SessionManager {
 
   setUp() {
     this.socketHandler.setupListeners();
-    new Interface().setupListeners();
-    new ChatHandler().setupListeners();
     Canvas.getInstance();
   }
 

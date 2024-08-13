@@ -24,7 +24,7 @@ const HTMLContent = [
 
 Promise.all(HTMLContent.map((html) => loadHTML(html.id, html.src)))
   .then(() => {
-    // Re-setup UI after HTML injections
+    //Setup UI after all HTML injections
     new UserInterface().setupListeners();
     new ChatHandler().setupListeners();
   })

@@ -5,6 +5,7 @@ import { CanvasState, Page } from "../../util/enums";
 import Paint from "../../util/paint";
 import PageElements from "./elements";
 import UserInterface from "../main";
+import { LoaderConstructor } from "../canvas-previews/loaders";
 
 export default class EventListeners {
   private elements = new PageElements();
@@ -98,6 +99,25 @@ export default class EventListeners {
         new UserInterface().updatePage();
       });
     }
+  }
+
+  listenCustomizeUser() {
+    const customizeUser = document.getElementById("customize-username");
+    customizeUser?.addEventListener("click", () => {
+      console.log("clicked");
+    });
+  }
+
+  listenGenerateUser() {
+    const button = this.elements.generateUserButton() as HTMLButtonElement;
+    button?.addEventListener("click", (e) => {
+      const user_signIn = document.getElementById("user-signin");
+      if (user_signIn) {
+        user_signIn.innerHTML = LoaderConstructor.spinner;
+      }
+      SocketHandler.getInstance().getSocket().emit("generate-user");
+      button.disabled = true;
+    });
   }
 
   private startArtistMode(state: CanvasState) {
