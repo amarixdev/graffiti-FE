@@ -8,12 +8,12 @@ import { ImageFile, ImagePreview } from "./util/types";
 export default class SessionManager {
   private static instance: SessionManager;
 
-  private currentPage: Page = Page.canvas;
+  private currentPage: Page = Page.community;
   private socketHandler: SocketHandler;
   private tagPreviews: Set<ImagePreview>;
   private tagPreviews_map: Map<string, ImageFile>;
   private lastPreviewAddedID: string = "";
-  private artistMode: boolean = false;
+  private artistMode: boolean = true;
   private previewRef: HTMLElement | null = null;
 
   private constructor() {
@@ -52,6 +52,7 @@ export default class SessionManager {
     this.socketHandler.setupListeners();
     new Interface().setupListeners();
     new ChatHandler().setupListeners();
+    Canvas.getInstance();
   }
 
   setPage(page: Page) {
@@ -91,4 +92,3 @@ export default class SessionManager {
 }
 
 SessionManager.getInstance().setUp();
-

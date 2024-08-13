@@ -2,9 +2,9 @@
   class="flex justify-between items-center fixed w-full h-10 bg-[#101010] k top-0 px-5"
 >
   <div class="flex font-thin items-center gap-2">
-    <h3 class="font-thin text-white text-sm mx-2 shadow-sm shadow-black">
+    <!-- <h3 class="font-thin text-white text-sm mx-2 shadow-sm shadow-black">
       Shortcuts
-    </h3>
+    </h3> -->
     <p class="text-white">[</p>
     <div class="flex gap-6 text-sm">
       <button id="color-btn-r" class="text-[#c9c9c9]">
@@ -37,9 +37,11 @@
     </div>
     <p class="text-white">]</p>
   </div>
-  <button id="page-toggler" class="text-white font-thin">Canvas</button>
+  <button id="page-toggler" class="text-white font-thin">
+    <i class="fa-solid fa-paintbrush"></i>
+  </button>
   <div class="flex items-center justify-between gap-5 w-[400px]">
-    <div class="flex gap-4 items-center">
+    <div id="color-picker-container" class="flex gap-4 items-center">
       <h1 class="text-[#f4f4f4] font-light text-sm">Color Picker</h1>
       <input
         type="color"

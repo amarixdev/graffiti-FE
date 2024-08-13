@@ -49,7 +49,7 @@ export default class ServerOperations {
 
     const uInterface = new UInterface();
     uInterface.saveBtn_toggle(Button.disabled);
-    uInterface.updatePageUI();
+    uInterface.updatePage();
     canvas.clear();
   }
 

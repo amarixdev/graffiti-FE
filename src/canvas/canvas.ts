@@ -5,13 +5,13 @@ import Paint from "../util/paint";
 import SocketHandler from "../network/socket-handler";
 import { Button, Page, RequestMethod, SocketType } from "../util/enums";
 import UInterface from "../interface/main";
-import ServerOperations from "./server";
+import ServerOperations from "./server-operations";
 import { CanvasState } from "../util/enums";
 import { FetchRequests } from "../network/fetch-requests";
 import Worker from "./worker?worker";
 import SessionManager from "../session";
 import IndexDBManager from "../storage/indexed-db";
-import UserInterface from "../interface/main";
+import PageElements from "../interface/global/elements";
 
 export default class Canvas {
   private p: p5;
@@ -28,6 +28,7 @@ export default class Canvas {
   private prevX: number = 0;
   private prevY: number = 0;
   private bitmap: any | null = null;
+
   private constructor(socket: Socket) {
     this.socket = socket;
     this.p = new p5(this.init);
@@ -37,14 +38,10 @@ export default class Canvas {
   private static instance: Canvas;
   static getInstance() {
     if (!Canvas.instance) {
+      console.log("setting up canvas");
       Canvas.instance = new Canvas(SocketHandler.getInstance().getSocket());
-      console.log("creating instance");
     }
     return Canvas.instance;
-  }
-
-  newCanvas() {
-    this.p = new p5(this.init);
   }
 
   getCanvasId() {
@@ -98,6 +95,7 @@ export default class Canvas {
     worker.postMessage({ computed: computed, canvas: canvas }, [canvas]);
 
     worker.onmessage = (event) => {
+      // new PageElements().canvasPage()?.classList.remove("hidden");
       console.log("bitmap start");
       this.bitmap = event.data;
       const mainCanvas = document.getElementById(
@@ -128,8 +126,6 @@ export default class Canvas {
   clear(): void {
     this.p.clear();
     this.p.background(200, 200, 200);
-    // this.paintStrokes = new PaintStrokes();
-    // this.paintStroke = [];
   }
 
   save(method: RequestMethod): void {
@@ -153,20 +149,21 @@ export default class Canvas {
 
   resetPaintStrokes(): void {
     this.paintStrokes.reset();
+    this.blankCanvas = true;
   }
 
-  undo(): void {
-    this.paintStrokes.pop();
-    this.clear();
-    //TODO: <!BUG!> deleting loaded data.. Also too slow, needs re-write
-    this.paintStrokes.forEach((stroke) => {
-      this.loadCanvas(stroke, CanvasState.new);
-    });
+  // undo(): void {
+  //   this.paintStrokes.pop();
+  //   this.clear();
+  //   //TODO: <!BUG!> deleting loaded data.. Also too slow, needs re-write
+  //   this.paintStrokes.forEach((stroke) => {
+  //     this.loadCanvas(stroke, CanvasState.new);
+  //   });
 
-    if (this.paintStrokes.length == 0) {
-      this.interface.undoBtn_toggle(Button.disabled);
-    }
-  }
+  //   if (this.paintStrokes.length == 0) {
+  //     this.interface.undoBtn_toggle(Button.disabled);
+  //   }
+  // }
 
   startLoop() {
     this.p.loop();
@@ -199,7 +196,6 @@ export default class Canvas {
     p.draw = async () => {
       if (this.bitmap) {
         // Draw the bitmap image onto the canvas
-        p.filter("blur", 10);
         p.drawingContext.drawImage(
           this.bitmap,
           0,
@@ -207,6 +203,7 @@ export default class Canvas {
           this.bitmap.width,
           this.bitmap.height
         );
+        // p.filter("blur", 1);
 
         const bitmap = await createImageBitmap(this.bitmap); // Assuming you have an ImageBitmap
 
@@ -218,9 +215,10 @@ export default class Canvas {
 
         this.bitmap = null;
         console.log("done");
+        //handle page updates;
         const ui = new UInterface();
         ui.restorePreview();
-        ui.updatePageUI();
+        ui.updatePage();
       }
       const stroke: Stroke = {
         x: p.mouseX,

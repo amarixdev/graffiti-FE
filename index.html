@@ -20,16 +20,16 @@
   </head>
 
   <body class="bg-black">
-    <div
-      id="site-containter"
-      class="w-full flex h-screen border-red-500 border-2 pt-[40px]"
-    >
+    <div id="site-containter" class="w-full flex h-screen pt-[40px]">
       <!-- Live Chat -->
       <section id="live-chat"></section>
 
       <!-- Canvas-->
-      <div id="artist-container" class="h-full w-full flex items-start">
-        <section id="canvas-container" class="z-0 relative">
+      <div id="canvas-page" class="h-full w-full flex items-start">
+        <section
+          id="canvas-container"
+          class="z-0 relative border-green-500 border-2"
+        >
           <div
             id="artists-screen"
             class="transition-all z-[100] flex justify-center absolute w-full h-full border-red-500 bg-black opacity-0 bg-opacity-80 backdrop-blur-sm"
@@ -55,19 +55,27 @@
       </div>
 
       <!-- Community Page  -->
-      <section id="community-container" class="w-full hidden">
+      <section id="community-container" class="w-full hidden overflow-y-scroll">
         <div
           id="color-backdrop"
-          class="z-[9999] h-full bg-gradient-to-b to-[#000] from-[#30abd0]"
-        >
-          <!--b: #30abd0, r:#d03030, g: #30d035, o:#d07330 y:#d0c530 i:#5530d0 v:#a030d0 w:#ffffff k:#202020 -->
-          <div
-            id="community-grid"
-            class="grid grid-cols-3 gap-[10px] max-h-full p-5"
-          ></div>
+          class="z-[0] w-screen min-h-full fixed bg-gradient-to-b to-[#000] from-[#30abd0]"
+        ></div>
+        <div class="fixed w-full bg-[#121212] top-10 h-20 z-[9999]">
+          <div class="flex flex-col p-3">
+            <p class="text-3xl font-light text-white">Community</p>
+            <p class="text-1xl font-light text-[#a5a5a5]">
+              Collaborate with other artists. Select a canvas to leave your
+              mark.
+            </p>
+          </div>
         </div>
+        <div
+          id="community-grid"
+          class="grid grid-cols-3 gap-x-[10px] gap-y-[30px] max-h-full p-5 top-20 relative"
+        ></div>
+
         <button
-          id="create-button"
+          id="create-btn"
           class="w-[200px] flex gap-5 bottom-5 right-5 text-[#d2d2d2] hover:text-white fixed p-2 rounded-lg border-2 border-[#444] flex items-center justify-center active:scale-95 transition-all bg-black"
         >
           <p id="signature" class="font-light text-3xl">Create</p>

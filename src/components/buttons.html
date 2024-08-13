@@ -2,7 +2,7 @@
   <!--Artist mode-->
   <div
     id="artist-buttons"
-    class="hidden flex px-2 flex-col gap-5 border-2 border-green-500 items-center"
+    class="flex px-2 flex-col gap-5 border-2 border-green-500 items-center"
   >
     <div id="save-btn-container" class="w-fit">
       <button
@@ -26,9 +26,8 @@
     </button>
   </div>
 
-  <!--Tag Button-->
   <div class="flex flex-col justify-between py-4 h-full">
-    <div class="flex flex-col gap-10">
+    <div id="preview-buttons" class="flex flex-col gap-10 hidden">
       <button
         id="tag-button"
         class="w-[130px] p-2 rounded-lg border-2 border-[#444] flex items-center justify-center active:scale-95 transition-all bg-black"
@@ -53,8 +52,8 @@
         </p>
       </button>
       <button
-        id="create-button"
-        class="w-[130px] p-1 rounded-lg border-2 border-[#444] flex items-center justify-center active:scale-95 transition-all bg-black"
+        id="create-btn"
+        class="w-[130px] mt-14 p-1 rounded-lg border-2 border-[#444] flex items-center justify-center active:scale-95 transition-all bg-black"
       >
         <p
           id="signature"
@@ -76,7 +75,7 @@
       </p>
     </button>
     <button
-      id="back-button"
+      id="back-btn"
       class="w-[130px] rounded-lg border-2 border-[#444] flex items-center justify-center active:scale-95 transition-all bg-blue-400"
     >
       <p

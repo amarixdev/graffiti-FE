@@ -36,36 +36,36 @@ export default class IndexDBManager {
       console.log(e);
     };
 
-    request.onsuccess = (e) => {
-      const db = (e.target as IDBOpenDBRequest).result;
+    // request.onsuccess = (e) => {
+    //   const db = (e.target as IDBOpenDBRequest).result;
 
-      // Now add the data, whether or not the version has changed
-      const transaction = db.transaction(["canvas"], "readwrite");
-      const objectStore = transaction.objectStore("canvas");
+    //   // Now add the data, whether or not the version has changed
+    //   const transaction = db.transaction(["canvas"], "readwrite");
+    //   const objectStore = transaction.objectStore("canvas");
 
-      const addRequest = objectStore.put({
-        id: id,
-        bitmap: bitmap,
-        strokes: paintStrokes,
-      });
+    //   const addRequest = objectStore.put({
+    //     id: id,
+    //     bitmap: bitmap,
+    //     strokes: paintStrokes,
+    //   });
 
-      addRequest.onerror = (e) => {
-        console.log(e);
-      };
+    //   addRequest.onerror = (e) => {
+    //     console.log(e);
+    //   };
 
-      addRequest.onsuccess = (e) => {
-        console.log("Data added successfully", e);
-      };
-    };
+    //   addRequest.onsuccess = (e) => {
+    //     console.log("Data added successfully", e);
+    //   };
+    // };
 
-    request.onupgradeneeded = (e: IDBVersionChangeEvent) => {
-      const db = (e.target as IDBOpenDBRequest).result;
+    // request.onupgradeneeded = (e: IDBVersionChangeEvent) => {
+    //   const db = (e.target as IDBOpenDBRequest).result;
 
-      // Create the object store if it doesn't exist
-      if (!db.objectStoreNames.contains("canvas")) {
-        db.createObjectStore("canvas", { keyPath: "id" });
-      }
-    };
+    //   // Create the object store if it doesn't exist
+    //   if (!db.objectStoreNames.contains("canvas")) {
+    //     db.createObjectStore("canvas", { keyPath: "id" });
+    //   }
+    // };
   }
 
   get(id: string): any {

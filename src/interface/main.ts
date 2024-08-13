@@ -26,13 +26,15 @@ export default class UserInterface {
     this.listeners.listenColorPicker_Button("color-backdrop");
     this.listeners.listenColorPicker_Button("artist-container");
     this.listeners.listenColorPicker_KeyPress();
-    this.listeners.listenTagButton();
-    this.listeners.listenClearButton();
+    this.listeners.listenTag_Button();
+    this.listeners.listenClear_Button();
     this.listeners.listenPageToggle();
     this.listeners.listenViewArtists_Button();
+    this.listeners.listenCreate_Button();
+    this.listeners.listenBack_Button();
   }
 
-  updatePageUI(): void {
+  updatePage(): void {
     this.page.updatePageUI();
   }
 

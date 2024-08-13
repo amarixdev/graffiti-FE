@@ -65,6 +65,7 @@ export default class SocketHandler {
         SessionManager.getInstance().setTagPreviews_map(preview_map);
         new UserInterface().renderPreviews(Previews.collection);
 
+
         this.sessionUsername = user;
         if (userTag && artistsOnline) {
           userTag.textContent = user;

@@ -11,7 +11,7 @@ export default class PreviewConstructor {
 
   /*renders a new canvas preview*/
   render(type: Previews) {
-    Canvas.getInstance().clear();
+    // Canvas.getInstance().clear();
     const session = SessionManager.getInstance();
     const tagPreviews_map: Map<string, ImageFile> =
       type == Previews.collection
@@ -105,22 +105,22 @@ export default class PreviewConstructor {
     const blob = new Blob([arrayBuffer], {
       type: imgFile.mimetype,
     });
-
     const url = URL.createObjectURL(blob);
     const img = document.createElement("img");
+
     img.addEventListener("click", async () => {
-      SessionManager.getInstance().setPage(Page.canvas);
-      //create loader; returns a reference to preview
+      const session = SessionManager.getInstance();
+      session.setPage(Page.canvas);
+      session.setArtistMode(false);
       new LoaderConstructor().display_CanvasLoader(id);
 
       //TODO: Add cursor-not-allowed and disable event listener during load
 
       //fetch canvas from database or client storage (indexedDB)
       await FetchRequests.renderCanvas(id).then((data: any) => {
-        Canvas.getInstance().clear();
-        console.log(Canvas.getInstance().getPaintStrokes());
         console.log("Success:", data);
-        const canvas = Canvas.getInstance();
+        const canvas = Canvas.getInstance(); //cannot setup canvas if it is hidden
+        canvas.clear();
         canvas.setCanvasId(id);
         if (data.isLocal) {
           canvas.loadBitmap(data.canvas.bitmap, data.canvas.strokes);

@@ -9,7 +9,7 @@ export default class PageElements {
   private COMMUNITY_PAGE: HTMLElement | null = document.getElementById(
     "community-container"
   );
-  private CANVAS_PAGE: HTMLElement | null =
+  private CANVAS_CONTAINER: HTMLElement | null =
     document.getElementById("canvas-container");
   private COMMUNITY_GRID: HTMLElement | null =
     document.getElementById("community-grid");
@@ -17,8 +17,8 @@ export default class PageElements {
   private ARTIST_BTN: HTMLElement | null =
     document.getElementById("artist-buttons");
 
-  private ARTIST_CONTAINER: HTMLElement | null =
-    document.getElementById("artist-container");
+  private CANVAS_PAGE: HTMLElement | null =
+    document.getElementById("canvas-page");
 
   private VIEW_ARTISTS_BTN: HTMLElement | null =
     document.getElementById("view-artists-btn");
@@ -29,8 +29,21 @@ export default class PageElements {
   private PREVIEW_BUTTONS: HTMLElement | null =
     document.getElementById("preview-buttons");
 
+  private CREATE_BUTTON: HTMLElement | null =
+    document.getElementById("create-btn");
+
+  private BACK_BUTTON: HTMLElement | null = document.getElementById("back-btn");
+
   artistsScreen() {
     return this.ARTISTS_SCREEN;
+  }
+
+  backButton() {
+    return this.BACK_BUTTON;
+  }
+
+  createButton() {
+    return this.CREATE_BUTTON;
   }
 
   previewButtons() {
@@ -63,8 +76,8 @@ export default class PageElements {
   communityGrid() {
     return this.COMMUNITY_GRID;
   }
-  canvasPage() {
-    return this.CANVAS_PAGE;
+  canvasContainer() {
+    return this.CANVAS_CONTAINER;
   }
   tagButton() {
     return this.TAG_BTN;
@@ -72,9 +85,9 @@ export default class PageElements {
   artistButtons() {
     return this.ARTIST_BTN;
   }
-  artistContainer() {
-    console.log(this.ARTIST_CONTAINER);
-    return this.ARTIST_CONTAINER;
+  canvasPage() {
+    console.log(this.CANVAS_PAGE);
+    return this.CANVAS_PAGE;
   }
 
   init_saveButtonContainer() {

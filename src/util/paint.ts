@@ -1,6 +1,4 @@
-import { Session } from "inspector";
 import Canvas from "../canvas/canvas";
-import SessionManager from "../session";
 
 export default class Paint {
   static red = { paint: [255, 0, 0], ui: "#d03030" };
