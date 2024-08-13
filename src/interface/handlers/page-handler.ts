@@ -24,8 +24,8 @@ export default class PageHandler {
       console.log(session.getPage());
       pageToggle.innerHTML =
         session.getPage() == Page.community
-          ? `<i class="fa-solid fa-user-group"></i>`
-          : `<i class="fa-solid fa-paintbrush "></i>`;
+          ? `<i class="fa-solid fa-user-group text-lg"></i>`
+          : `<i class="fa-solid fa-paintbrush text-lg "></i>`;
     }
 
     if (session.isArtistMode()) {
