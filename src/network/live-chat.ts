@@ -1,5 +1,6 @@
 import SocketHandler from "./socket-handler";
 import { SocketType } from "../util/enums";
+import SessionManager from "../session";
 
 export default class ChatHandler {
   chatInput = document.getElementById("chat-input") as HTMLInputElement;
@@ -12,12 +13,15 @@ export default class ChatHandler {
     console.log("set up");
     const socket = SocketHandler.getInstance();
     this.chatForm?.addEventListener("submit", (e) => {
-      e.preventDefault();
-      let message = this.chatInput.value;
-      if (message) {
-        socket.getSocket().emit("chat", message);
-        this.addMessage(message, SocketType.user, socket.getSessionUsername());
-        this.chatInput.value = "";
+      const user = SessionManager.getInstance().getUsername();
+      if (user) {
+        e.preventDefault();
+        let message = this.chatInput.value;
+        if (message) {
+          socket.getSocket().emit("chat", message);
+          this.addMessage(message, SocketType.user, user);
+          this.chatInput.value = "";
+        }
       }
     });
 
@@ -35,6 +39,7 @@ export default class ChatHandler {
     });
   }
 
+  //add message bubble
   addMessage(message: string, type: SocketType, user: string) {
     // Create the container div
     const newMessage = document.createElement("div");

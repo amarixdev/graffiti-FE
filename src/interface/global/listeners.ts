@@ -101,16 +101,49 @@ export default class EventListeners {
     }
   }
 
-  listenCustomizeUser() {
+  listenBegin_Button() {
+    const beginButton = document.getElementById("begin-btn");
+    beginButton?.addEventListener("click", () => {
+      const input = document.getElementById(
+        "custom-user-input"
+      ) as HTMLInputElement;
+
+      //set username
+      const customUsername = input.value;
+      const userTag = document.getElementById("user-tag");
+      if (userTag) {
+        if (customUsername.length > 0) {
+          SessionManager.getInstance().setUsername(customUsername);
+          userTag.textContent = customUsername;
+          SocketHandler.getInstance()
+            .getSocket()
+            .emit("update-user", customUsername);
+        }
+      }
+
+      //update UI
+      const signInScreen = document.getElementById("sign-in");
+      signInScreen?.classList.add("hidden");
+      this.elements.canvasPage()?.classList.remove("hidden");
+      Canvas.getInstance();
+    });
+  }
+
+  listenCustomUser_Button() {
     const customizeUser = document.getElementById("customize-username");
     customizeUser?.addEventListener("click", () => {
-      console.log("clicked");
+      const input = document.getElementById("custom-user-input");
+      const username = document.getElementById("generated-username");
+      username?.classList.toggle("hidden");
+      input?.classList.toggle("hidden");
     });
   }
 
   listenGenerateUser() {
     const button = this.elements.generateUserButton() as HTMLButtonElement;
-    button?.addEventListener("click", (e) => {
+    button?.addEventListener("click", () => {
+      const input = document.getElementById("custom-user-input");
+      input?.classList.add("hidden");
       const user_signIn = document.getElementById("user-signin");
       if (user_signIn) {
         user_signIn.innerHTML = LoaderConstructor.spinner;

@@ -5,6 +5,9 @@
 .signature {
   font-family: "Chalkduster", fantasy;
 }
+input:focus {
+  outline: none;
+}
 
 #canvas-container {
   min-width: 62vw;

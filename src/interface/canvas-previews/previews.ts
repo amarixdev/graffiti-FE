@@ -73,9 +73,7 @@ export default class PreviewConstructor {
     viewArtistBtn.innerText = "View Artists";
 
     details.appendChild(viewArtistBtn);
-    details.classList.add("font-light");
-    details.classList.add("text-sm");
-    details.classList.add("text-white");
+    details.classList.add("font-light", "text-sm", "text-white");
     return details;
   }
 

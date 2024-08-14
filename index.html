@@ -35,12 +35,15 @@
               </div>
             </div>
             <div
-              class="flex gap-5 items-center justify-center min-w-full pl-20"
+              class="flex gap-5 items-center justify-center min-w-full pl-24"
             >
               <i class="fa-solid fa-user text-white text-2xl"></i>
-              <div class="flex items-center justify-start gap-4 min-w-[550px]">
+              <div
+                class="flex items-center justify-start gap-4 min-w-[550px] h-20"
+              >
                 <div class="text-3xl text-white">Sign in as:</div>
                 <div id="user-signin">
+                  <!--loader source: https://flowbite.com/docs/components/spinner/-->
                   <svg
                     id="username-loader"
                     aria-hidden="true"
@@ -59,6 +62,12 @@
                     />
                   </svg>
                 </div>
+                <input
+                  type="text"
+                  id="custom-user-input"
+                  placeholder="johndoe88"
+                  class="hidden lowercase -translate-x-3 py-2 px-3 text-lg signature text-white border-2 border-[#333] w-6/12 bg-black rounded-lg"
+                />
               </div>
             </div>
           </div>
@@ -85,7 +94,7 @@
           <button
             class="signature text-white rounded-md mt-16 text-4xl w-6/12 bg-[#444] p-4 active:scale-95 transition-all"
           >
-            Enter
+            <p id="begin-btn" class="hover:animate-pulse">Begin</p>
           </button>
         </div>
       </section>
@@ -147,7 +156,7 @@
           id="create-btn"
           class="w-[200px] flex gap-5 bottom-5 right-5 text-[#d2d2d2] hover:text-white fixed p-2 rounded-lg border-2 border-[#444] flex items-center justify-center active:scale-95 transition-all bg-black"
         >
-          <p class="signature font-light text-3xl">Create</p>
+          <p class="signature font-light text-2xl">Create</p>
           <i class="fa-solid fa-plus text-3xl"></i>
         </button>
       </section>

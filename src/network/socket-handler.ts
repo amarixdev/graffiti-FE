@@ -10,7 +10,6 @@ import PageElements from "../interface/global/elements";
 
 export default class SocketHandler {
   private constructor() {}
-  //ensure a single instance of the socket is created
   private static instance: SocketHandler;
   static getInstance(): SocketHandler {
     if (!SocketHandler.instance) {
@@ -34,13 +33,11 @@ export default class SocketHandler {
 
   private renderUsername(user: string) {
     this.sessionUsername = user;
-
+    SessionManager.getInstance().setUsername(user);
     const username = document.createElement("p");
     username.innerText = this.sessionUsername;
-    username.id = "username";
-    username.classList.add("signature");
-    username.classList.add("text-white");
-    username.classList.add("text-2xl");
+    username.id = "generated-username";
+    username.classList.add("signature", "text-white", "text-2xl");
     const username_loader = document.getElementById("username-loader");
     if (username) {
       username_loader?.replaceWith(username);
@@ -70,13 +67,13 @@ export default class SocketHandler {
 
     socket.on("chat", (data: string, user: string) => {
       new ChatHandler().addMessage(data, SocketType.remote, user);
+      console.log("user: " + user)
     });
 
     socket.on(
       "boot-up",
       (user: string, clients: number, tagPreviews: ImagePreview[]) => {
         this.sessionUsername = user;
-
         //convert serialized array into map
         const preview_map = new Map<string, ImageFile>();
         tagPreviews.forEach((preview) => {
@@ -88,7 +85,9 @@ export default class SocketHandler {
         if (artistsOnline) {
           artistsOnline.textContent = `${clients}`;
         }
-        SessionManager.getInstance().setTagPreviews_map(preview_map);
+        const session = SessionManager.getInstance();
+        session.setTagPreviews_map(preview_map);
+        session.setUsername(user);
         new UserInterface().renderPreviews(Previews.collection);
       }
     );

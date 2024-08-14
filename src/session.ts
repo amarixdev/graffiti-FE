@@ -1,13 +1,12 @@
 import Canvas from "./canvas/canvas";
-import Interface from "./interface/main";
-import ChatHandler from "./network/live-chat";
+
 import SocketHandler from "./network/socket-handler";
 import { Page } from "./util/enums";
 import { ImageFile, ImagePreview } from "./util/types";
 
 export default class SessionManager {
   private static instance: SessionManager;
-
+  private username: string | null = null;
   private currentPage: Page = Page.community;
   private socketHandler: SocketHandler;
   private tagPreviews: Set<ImagePreview>;
@@ -31,6 +30,14 @@ export default class SessionManager {
     return SessionManager.instance;
   }
 
+  setUsername(user: string): void {
+    this.username = user;
+    console.log("username set: " + user);
+  }
+  
+  getUsername(): string | null {
+    return this.username;
+  }
   //set the ID of the canvas the user is viewing
   setPreviewRef(ref: HTMLElement | null): void {
     this.previewRef = ref;
@@ -50,7 +57,6 @@ export default class SessionManager {
 
   setUp() {
     this.socketHandler.setupListeners();
-    Canvas.getInstance();
   }
 
   setPage(page: Page) {

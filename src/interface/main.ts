@@ -34,7 +34,8 @@ export default class UserInterface {
     this.listeners.listenCreate_Button();
     this.listeners.listenBack_Button();
     this.listeners.listenGenerateUser();
-    this.listeners.listenCustomizeUser();
+    this.listeners.listenCustomUser_Button();
+    this.listeners.listenBegin_Button();
   }
 
   updatePage(): void {
