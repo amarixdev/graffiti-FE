@@ -10,32 +10,35 @@ import { LoaderConstructor } from "./canvas-previews/loaders";
 export default class UserInterface {
   private buttons: ButtonHandler;
   private page: PageHandler;
-  private listeners: EventListeners;
   private previewConstructor: PreviewConstructor;
   private loaderConstructor: LoaderConstructor;
 
   constructor() {
     this.buttons = new ButtonHandler();
     this.page = new PageHandler();
-    this.listeners = new EventListeners();
     this.previewConstructor = new PreviewConstructor();
     this.loaderConstructor = new LoaderConstructor();
   }
 
   /*establish initial event listeners*/
-  setupListeners(): void {
-    this.listeners.listenColorPicker_Button("color-backdrop");
-    this.listeners.listenColorPicker_Button("artist-container");
-    this.listeners.listenColorPicker_KeyPress();
-    this.listeners.listenTag_Button();
-    this.listeners.listenClear_Button();
-    this.listeners.listenPageToggle();
-    this.listeners.listenViewArtists_Button();
-    this.listeners.listenCreate_Button();
-    this.listeners.listenBack_Button();
-    this.listeners.listenGenerateUser();
-    this.listeners.listenCustomUser_Button();
-    this.listeners.listenBegin_Button();
+  setupListeners_app(): void {
+    const listeners = new EventListeners();
+    listeners.listenColorPicker_Button("color-backdrop");
+    listeners.listenColorPicker_Button("artist-container");
+    listeners.listenColorPicker_KeyPress();
+    listeners.listenTag_Button();
+    listeners.listenClear_Button();
+    listeners.listenPageToggle();
+    listeners.listenViewArtists_Button();
+    listeners.listenCreate_Button();
+    listeners.listenBack_Button();
+  }
+
+  setupListeners_signin(): void {
+    const listeners = new EventListeners();
+    listeners.listenCustomUser_Button();
+    listeners.listenBegin_Button();
+    listeners.listenGenerateUser();
   }
 
   updatePage(): void {

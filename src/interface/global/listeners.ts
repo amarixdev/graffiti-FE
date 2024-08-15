@@ -65,30 +65,26 @@ export default class EventListeners {
   }
 
   listenCreate_Button() {
-    this.elements.createButton()?.addEventListener("click", () => {
-      this.elements.canvasPage()?.classList.remove("hidden");
-      const session = SessionManager.getInstance();
-      this.startArtistMode(CanvasState.new);
+    const createBtn = this.elements.createButton();
+    const createBtn_comm = document.getElementById("create-btn-comm");
 
-      if (session.getPage() == Page.community) {
-        session.setPage(Page.canvas);
-        new UserInterface().updatePage();
-      }
-    });
+    createBtn?.addEventListener("click", this.createCanvasHandler);
+    createBtn_comm?.addEventListener("click", this.createCanvasHandler);
   }
+
+  private createCanvasHandler = () => {
+    this.elements.canvasPage()?.classList.remove("hidden");
+    const session = SessionManager.getInstance();
+    this.startArtistMode(CanvasState.new);
+    if (session.getPage() == Page.community) {
+      session.setPage(Page.canvas);
+      new UserInterface().updatePage();
+    }
+  };
 
   listenTag_Button() {
     this.elements.tagButton()?.addEventListener("click", () => {
       this.startArtistMode(CanvasState.edit);
-    });
-  }
-
-  //DEV ONLY ###################################################################################################//
-  listenClear_Button() {
-    this.elements.clearButton()?.addEventListener("click", () => {
-      const canvas = Canvas.getInstance();
-      SocketHandler.getInstance().getSocket().emit("clear");
-      canvas.clear();
     });
   }
 
@@ -126,6 +122,7 @@ export default class EventListeners {
       signInScreen?.classList.add("hidden");
       this.elements.canvasPage()?.classList.remove("hidden");
       Canvas.getInstance();
+      new UserInterface().setupListeners_app();
     });
   }
 
@@ -150,6 +147,15 @@ export default class EventListeners {
       }
       SocketHandler.getInstance().getSocket().emit("generate-user");
       button.disabled = true;
+    });
+  }
+
+  //DEV ONLY ###################################################################################################//
+  listenClear_Button() {
+    this.elements.clearButton()?.addEventListener("click", () => {
+      const canvas = Canvas.getInstance();
+      SocketHandler.getInstance().getSocket().emit("clear");
+      canvas.clear();
     });
   }
 

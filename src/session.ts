@@ -1,5 +1,3 @@
-import Canvas from "./canvas/canvas";
-
 import SocketHandler from "./network/socket-handler";
 import { Page } from "./util/enums";
 import { ImageFile, ImagePreview } from "./util/types";
@@ -10,7 +8,10 @@ export default class SessionManager {
   private currentPage: Page = Page.community;
   private socketHandler: SocketHandler;
   private tagPreviews: Set<ImagePreview>;
-  private tagPreviews_map: Map<string, ImageFile>;
+  private tagPreviews_map: Map<
+    string,
+    { artists: string[] | null; img: ImageFile }
+  >;
   private lastPreviewAddedID: string = "";
   private artistMode: boolean = true;
   private previewRef: HTMLElement | null = null;
@@ -34,7 +35,7 @@ export default class SessionManager {
     this.username = user;
     console.log("username set: " + user);
   }
-  
+
   getUsername(): string | null {
     return this.username;
   }
@@ -67,13 +68,19 @@ export default class SessionManager {
     return this.currentPage;
   }
 
-  setTagPreviews_map(tagPreviews: Map<string, ImageFile>) {
+  setTagPreviews_map(
+    tagPreviews: Map<string, { artists: string[] | null; img: ImageFile }>
+  ) {
     this.tagPreviews_map = tagPreviews;
   }
 
-  insertTagPreview_map(id: string, imageFile: ImageFile) {
+  insertTagPreview_map(
+    id: string,
+    artists: string[] | null,
+    imageFile: ImageFile
+  ) {
     console.log(this.tagPreviews_map);
-    this.tagPreviews_map.set(id, imageFile);
+    this.tagPreviews_map.set(id, { artists: artists, img: imageFile });
     this.lastPreviewAddedID = id;
   }
 
@@ -81,7 +88,10 @@ export default class SessionManager {
     return this.tagPreviews_map;
   }
 
-  getLastAddedPreview_(): Map<string, ImageFile> {
+  getLastAddedPreview_(): Map<
+    string,
+    { artists: string[] | null; img: ImageFile }
+  > {
     const map = new Map();
     map.set(
       this.lastPreviewAddedID,

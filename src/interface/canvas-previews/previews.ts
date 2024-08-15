@@ -13,17 +13,22 @@ export default class PreviewConstructor {
   render(type: Previews) {
     // Canvas.getInstance().clear();
     const session = SessionManager.getInstance();
-    const tagPreviews_map: Map<string, ImageFile> =
+    const tagPreviews_map: Map<
+      string,
+      { artists: string[] | null; img: ImageFile }
+    > =
       type == Previews.collection
-        ? session.getTagPreviews_map()
+        ? session.getTagPreviews_map() //on boot-up
         : session.getLastAddedPreview_();
 
-    tagPreviews_map.forEach((imgFile, id) => {
+    tagPreviews_map.forEach((data, id) => {
       const loadingView = document.getElementById("loading-view");
       const previewContainer = this.constructContainer(id);
-      const img = this.constructImage(id, imgFile);
+      const img = this.constructImage(id, data.img);
+
       previewContainer.append(img);
-      previewContainer.append(this.stylePreviewUI());
+      previewContainer.append(this.constructArtistUI(data.artists));
+
       const tagAlert = document.createElement("img");
 
       previewContainer.appendChild(tagAlert);
@@ -43,7 +48,7 @@ export default class PreviewConstructor {
       preview.imageFile
     );
     updatedPreview.append(img);
-    updatedPreview.append(this.stylePreviewUI());
+    updatedPreview.append(this.constructArtistUI(null));
     console.log("loadingView: " + loadingView);
     if (loadingView) {
       console.log("replacing");
@@ -54,7 +59,7 @@ export default class PreviewConstructor {
   /*restores a canvas preview from loading state*/
   restore() {
     const loader = document.getElementById("canvas-loader");
-    this.stylePreviewUI();
+    this.constructArtistUI(null);
     const preview = SessionManager.getInstance().getPreviewRef();
     if (preview) {
       loader?.replaceWith(preview);
@@ -62,7 +67,7 @@ export default class PreviewConstructor {
   }
 
   /** add styles to preview interface */
-  private stylePreviewUI(): HTMLDivElement {
+  private constructArtistUI(username: string[] | null): HTMLDivElement {
     const details = document.createElement("div");
     details.style.width = "100%";
     details.style.height = "30px";
@@ -70,7 +75,7 @@ export default class PreviewConstructor {
     details.style.display = "flex";
     details.style.justifyContent = "center";
     const viewArtistBtn = document.createElement("button");
-    viewArtistBtn.innerText = "View Artists";
+    if (username) viewArtistBtn.innerText = username[0];
 
     details.appendChild(viewArtistBtn);
     details.classList.add("font-light", "text-sm", "text-white");

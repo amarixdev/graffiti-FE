@@ -67,7 +67,7 @@ export default class SocketHandler {
 
     socket.on("chat", (data: string, user: string) => {
       new ChatHandler().addMessage(data, SocketType.remote, user);
-      console.log("user: " + user)
+      console.log("user: " + user);
     });
 
     socket.on(
@@ -75,9 +75,17 @@ export default class SocketHandler {
       (user: string, clients: number, tagPreviews: ImagePreview[]) => {
         this.sessionUsername = user;
         //convert serialized array into map
-        const preview_map = new Map<string, ImageFile>();
+        const preview_map = new Map<
+          string,
+          { artists: string[] | null; img: ImageFile }
+        >();
+
+        console.log(tagPreviews);
         tagPreviews.forEach((preview) => {
-          preview_map.set(preview.id, preview.imageFile);
+          preview_map.set(preview.id!, {
+            artists: preview.artists,
+            img: preview.imageFile,
+          });
         });
 
         this.renderUsername(user);
@@ -103,8 +111,10 @@ export default class SocketHandler {
 
     socket.on("preview-loaded", (imagePreview: ImagePreview) => {
       console.log("preview loaded");
+      console.log("username: " + imagePreview.artists);
       SessionManager.getInstance().insertTagPreview_map(
         imagePreview.id,
+        imagePreview.artists,
         imagePreview.imageFile
       );
 

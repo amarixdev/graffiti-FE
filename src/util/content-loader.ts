@@ -25,7 +25,7 @@ const HTMLContent = [
 Promise.all(HTMLContent.map((html) => loadHTML(html.id, html.src)))
   .then(() => {
     //Setup UI after all HTML injections
-    new UserInterface().setupListeners();
+    new UserInterface().setupListeners_signin();
     new ChatHandler().setupListeners();
   })
   .catch((error) => console.error("Error loading all HTML content:", error));

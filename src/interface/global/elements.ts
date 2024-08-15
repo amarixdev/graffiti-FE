@@ -16,8 +16,10 @@ export default class PageElements {
   private TAG_BTN: HTMLElement | null = document.getElementById("tag-button");
   private ARTIST_BTN: HTMLElement | null =
     document.getElementById("artist-buttons");
+  
   private CANVAS_PAGE: HTMLElement | null =
     document.getElementById("canvas-page");
+  
   private VIEW_ARTISTS_BTN: HTMLElement | null =
     document.getElementById("view-artists-btn");
   private ARTISTS_SCREEN: HTMLElement | null =
@@ -26,6 +28,8 @@ export default class PageElements {
     document.getElementById("preview-buttons");
   private CREATE_BUTTON: HTMLElement | null =
     document.getElementById("create-btn");
+
+
   private BACK_BUTTON: HTMLElement | null = document.getElementById("back-btn");
   private GENERATE_USER: HTMLElement | null =
     document.getElementById("generate-username");
