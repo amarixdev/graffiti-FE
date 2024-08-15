@@ -2,6 +2,10 @@
   --dynamic-color: #30abd0;
 }
 
+.heavy {
+  font-weight: 550;
+}
+
 .signature {
   font-family: "Chalkduster", fantasy;
 }

@@ -35,7 +35,9 @@ export class FetchRequests {
   private static async fetchWithCache(url: string, id: string, options: {}) {
     const cacheKey = id;
     const storedCanvas = await IndexDBManager.getInstance().get(id);
+
     if (storedCanvas) {
+      console.log("fetching from IndexDB");
       return { isLocal: true, canvas: storedCanvas };
     }
 
@@ -43,6 +45,8 @@ export class FetchRequests {
       console.log("fetching cache" + this.cache);
       return this.cache.get(cacheKey);
     }
+
+    console.log("fetching normal");
 
     return await fetch(url, options)
       .then((response) => {

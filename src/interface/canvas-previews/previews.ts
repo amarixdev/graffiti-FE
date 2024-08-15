@@ -5,6 +5,7 @@ import { FetchRequests } from "../../network/fetch-requests";
 import { ImageFile, ImagePreview } from "../../util/types";
 import PageElements from "../global/elements";
 import { LoaderConstructor } from "./loaders";
+import { truncateString } from "../../util/functions";
 
 export default class PreviewConstructor {
   private elements = new PageElements();
@@ -24,7 +25,7 @@ export default class PreviewConstructor {
     tagPreviews_map.forEach((data, id) => {
       const loadingView = document.getElementById("loading-view");
       const previewContainer = this.constructContainer(id);
-      const img = this.constructImage(id, data.img);
+      const img = this.constructImage(id, data.img, data.artists);
 
       previewContainer.append(img);
       previewContainer.append(this.constructArtistUI(data.artists));
@@ -45,10 +46,11 @@ export default class PreviewConstructor {
     let updatedPreview: HTMLDivElement = this.constructContainer(preview.id);
     const img: HTMLImageElement = this.constructImage(
       preview.id,
-      preview.imageFile
+      preview.imageFile,
+      preview.artists
     );
     updatedPreview.append(img);
-    updatedPreview.append(this.constructArtistUI(null));
+    updatedPreview.append(this.constructArtistUI(preview.artists));
     console.log("loadingView: " + loadingView);
     if (loadingView) {
       console.log("replacing");
@@ -61,6 +63,7 @@ export default class PreviewConstructor {
     const loader = document.getElementById("canvas-loader");
     this.constructArtistUI(null);
     const preview = SessionManager.getInstance().getPreviewRef();
+    console.log("PREVIEW: " + preview);
     if (preview) {
       loader?.replaceWith(preview);
     }
@@ -69,15 +72,45 @@ export default class PreviewConstructor {
   /** add styles to preview interface */
   private constructArtistUI(username: string[] | null): HTMLDivElement {
     const details = document.createElement("div");
-    details.style.width = "100%";
-    details.style.height = "30px";
-    details.style.marginTop = "6px";
-    details.style.display = "flex";
-    details.style.justifyContent = "center";
-    const viewArtistBtn = document.createElement("button");
-    if (username) viewArtistBtn.innerText = username[0];
+    Object.assign(details.style, {
+      width: "100%",
+      height: "30px",
+      marginTop: "6px",
+      display: "flex",
+      justifyContent: "start",
+      alignItems: "center",
+      paddingLeft: "5px",
+      gap: "10px",
+    });
 
-    details.appendChild(viewArtistBtn);
+    const heading = document.createElement("i");
+    heading.classList.add("fa-solid", "fa-user");
+
+    if (username) {
+      let artistTag = "";
+      switch (username.length) {
+        case 1:
+          artistTag = `${truncateString(username[0], 30)}  ${username.length}`;
+          break;
+        case 2:
+          artistTag = `${truncateString(
+            username[0],
+            20
+          )} and <span class="heavy">1 other</span>`;
+          break;
+        default:
+          artistTag = `${truncateString(
+            username[0],
+            20
+          )} and <span class="heavy">${username.length - 1} others</span>`;
+          break;
+      }
+
+      const artists = document.createElement("p");
+      artists.innerHTML = artistTag;
+      details.appendChild(heading);
+      details.appendChild(artists);
+    }
     details.classList.add("font-light", "text-sm", "text-white");
     return details;
   }
@@ -89,12 +122,13 @@ export default class PreviewConstructor {
     const styles = ["shadow-black", "shadow-md", "cursor-pointer"];
 
     previewContainer.id = `preview-${id}`;
-    previewContainer.style.position = "relative";
-    previewContainer.style.width = "290px";
-    previewContainer.style.height = "280px";
-    previewContainer.style.padding = "10px";
-    previewContainer.style.background =
-      "linear-gradient(to bottom, #333333, #111111)";
+    Object.assign(previewContainer.style, {
+      position: "relative",
+      width: "290px",
+      height: "280px",
+      padding: "10px",
+      background: "linear-gradient(to bottom, #333333, #111111)",
+    });
 
     styles.forEach((style) => {
       previewContainer.classList.add(style);
@@ -103,7 +137,11 @@ export default class PreviewConstructor {
   }
 
   //converts raw blob data into an img element
-  private constructImage(id: string, imgFile: ImageFile): HTMLImageElement {
+  private constructImage(
+    id: string,
+    imgFile: ImageFile,
+    artists: string[] | null
+  ): HTMLImageElement {
     const arrayBuffer = imgFile.buffer;
     const blob = new Blob([arrayBuffer], {
       type: imgFile.mimetype,
@@ -112,6 +150,7 @@ export default class PreviewConstructor {
     const img = document.createElement("img");
 
     img.addEventListener("click", async () => {
+      this.constructSignatureContainer(artists);
       const session = SessionManager.getInstance();
       session.setPage(Page.canvas);
       session.setArtistMode(false);
@@ -135,10 +174,10 @@ export default class PreviewConstructor {
 
     img.id = `img-${id}`;
     img.className = "img-opacity-dim";
-    img.style.cursor = "pointer";
-    img.style.width = "100%";
     img.src = url;
     img.alt = "rendered image";
+    img.style.cursor = "pointer";
+    img.style.width = "100%";
 
     img.onload = () => {
       console.log(`Image ${id} loaded successfully`);
@@ -147,5 +186,16 @@ export default class PreviewConstructor {
       console.error(`Error loading image ${id}`, e);
     };
     return img;
+  }
+
+  private constructSignatureContainer(artists: string[] | null) {
+    const signatureContainer = document.getElementById("signature-container");
+    if (signatureContainer) signatureContainer.innerHTML = "";
+
+    artists?.forEach((artist) => {
+      const signature = document.createElement("p");
+      signature.innerText = artist;
+      signatureContainer?.append(signature);
+    });
   }
 }

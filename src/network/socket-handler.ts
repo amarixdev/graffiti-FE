@@ -79,8 +79,7 @@ export default class SocketHandler {
           string,
           { artists: string[] | null; img: ImageFile }
         >();
-
-        console.log(tagPreviews);
+        
         tagPreviews.forEach((preview) => {
           preview_map.set(preview.id!, {
             artists: preview.artists,
