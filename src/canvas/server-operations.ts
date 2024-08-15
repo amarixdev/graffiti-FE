@@ -25,6 +25,10 @@ export default class ServerOperations {
         formData.append("image", img!, "canvas.png"); // Append the blob with a filename
         formData.append("method", JSON.stringify(requestMethod));
         formData.append("id", JSON.stringify(canvasID));
+        formData.append(
+          "artist",
+          JSON.stringify(SessionManager.getInstance().getUsername())
+        );
 
         //render a loading container on new posts
         if (method == RequestMethod.post) {

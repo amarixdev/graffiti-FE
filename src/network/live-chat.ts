@@ -18,7 +18,7 @@ export default class ChatHandler {
         e.preventDefault();
         let message = this.chatInput.value;
         if (message) {
-          socket.getSocket().emit("chat", message);
+          socket.getSocket().emit("chat", message, user);
           this.addMessage(message, SocketType.user, user);
           this.chatInput.value = "";
         }
