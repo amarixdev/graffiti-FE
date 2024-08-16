@@ -12,7 +12,6 @@ export default class EventListeners {
 
   listenViewArtists_Button() {
     this.elements.viewArtistsButton()?.addEventListener("click", () => {
-      console.log("clicked");
       const artistsScreen = this.elements.artistsScreen();
       if (artistsScreen) artistsScreen.classList.toggle("opacity-0");
     });
@@ -20,7 +19,6 @@ export default class EventListeners {
 
   listenBack_Button() {
     this.elements.backButton()?.addEventListener("click", () => {
-      console.log("clicked");
       const session = SessionManager.getInstance();
       if (session.isArtistMode()) {
         session.setArtistMode(false);
@@ -46,7 +44,6 @@ export default class EventListeners {
       btn?.addEventListener("click", () => {
         const canvas = Canvas.getInstance();
         const artistMode = SessionManager.getInstance().isArtistMode();
-        console.log(artistMode);
         if (artistMode) {
           canvas.setColor(Paint.values[i].paint);
         }
@@ -100,7 +97,6 @@ export default class EventListeners {
   }
 
   listenBegin_Button() {
-    Canvas.clearInstance(); //ensure canvas has not been initialized
     const beginButton = document.getElementById("begin-btn");
     beginButton?.addEventListener("click", () => {
       const input = document.getElementById(
@@ -137,6 +133,11 @@ export default class EventListeners {
         setTimeout(() => {
           setupLoader?.classList.add("hidden");
           document.body.style.backgroundColor = "black";
+
+          //ensures a new instance is initialized each time
+          if (Canvas.hasInstance()) {
+            Canvas.clearInstance();
+          }
           Canvas.getInstance();
           ui.setupListeners_app();
         }, RENDER_DELAY);
@@ -202,7 +203,7 @@ export default class EventListeners {
     session.setArtistMode(false);
     this.elements.artistButtons()?.classList.add("hidden");
   }
-  
+
   //DEV ONLY ###################################################################################################//
   listenClear_Button() {
     this.elements.clearButton()?.addEventListener("click", () => {
