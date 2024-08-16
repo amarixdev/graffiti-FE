@@ -202,10 +202,6 @@ export default class Canvas {
         canvas.id("artist-canvas");
         p.background(200, 200, 200);
       };
-
-      p.windowResized = () => {
-        this.resizeCanvas();
-      };
     }
 
     p.draw = async () => {
