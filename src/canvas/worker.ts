@@ -14,7 +14,6 @@ self.onmessage = function (msg) {
     });
   });
 
-  console.log("converting to blov");
   // Transfer the canvas content as an ImageBitmap to the main thread
   canvas.convertToBlob().then((blob: any) => {
     createImageBitmap(blob).then((bitmap) => {

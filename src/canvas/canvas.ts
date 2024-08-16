@@ -47,6 +47,14 @@ export default class Canvas {
     return Canvas.instance;
   }
 
+  static hasInstance(): boolean {
+    if (this.instance) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   static clearInstance() {
     this.instance = null;
   }
@@ -216,7 +224,7 @@ export default class Canvas {
           this.canvasId,
           this.paintStrokes.get()
         );
-        
+
         this.bitmap = null;
 
         //handle page updates;

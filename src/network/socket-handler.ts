@@ -67,7 +67,6 @@ export default class SocketHandler {
 
     socket.on("chat", (data: string, user: string) => {
       new ChatHandler().addMessage(data, SocketType.remote, user);
-      console.log("user: " + user);
     });
 
     socket.on(
@@ -110,7 +109,6 @@ export default class SocketHandler {
 
     socket.on("preview-loaded", (imagePreview: ImagePreview) => {
       console.log("preview loaded");
-      console.log("username: " + imagePreview.artists);
       SessionManager.getInstance().insertTagPreview_map(
         imagePreview.id,
         imagePreview.artists,

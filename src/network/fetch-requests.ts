@@ -21,7 +21,6 @@ export class FetchRequests {
   }
 
   static async renderCanvas(id: string) {
-    console.log("rendering");
     return await this.fetchWithCache(
       `http://${this.HOSTNAME}:${this.PORT}/render-canvas`,
       id,

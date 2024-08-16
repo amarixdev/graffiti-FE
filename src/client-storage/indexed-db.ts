@@ -76,7 +76,6 @@ export default class IndexDBManager {
         console.log("Database opened successfully");
         this.fetchData(db, id)
           .then((records: any) => {
-            console.log("records" + records);
             resolve(records);
           })
           .catch((err) => {

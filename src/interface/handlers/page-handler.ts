@@ -7,7 +7,6 @@ export default class PageHandler {
   private elements = new PageElements();
 
   updatePageUI() {
-    console.log("page changing...");
     const pageToggle = document.getElementById("page-toggler");
     const session = SessionManager.getInstance();
 
@@ -15,13 +14,11 @@ export default class PageHandler {
       this.displayCommunityPage();
       session.setPage(Page.community);
     } else {
-      console.log("displaying canvas page");
       this.displayCanvasPage();
       session.setPage(Page.canvas);
     }
 
     if (pageToggle) {
-      console.log(session.getPage());
       pageToggle.innerHTML =
         session.getPage() == Page.community
           ? `<i class="fa-solid fa-user-group text-lg"></i>`

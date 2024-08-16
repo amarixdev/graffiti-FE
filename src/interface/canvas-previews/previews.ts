@@ -52,7 +52,6 @@ export default class PreviewConstructor {
     updatedPreview.append(this.constructArtistUI(preview.artists));
     console.log("loadingView: " + loadingView);
     if (loadingView) {
-      console.log("replacing");
       loadingView.replaceWith(updatedPreview);
     }
   }
@@ -62,7 +61,6 @@ export default class PreviewConstructor {
     const loader = document.getElementById("canvas-loader");
     this.constructArtistUI(null);
     const preview = SessionManager.getInstance().getPreviewRef();
-    console.log("PREVIEW: " + preview);
     if (preview) {
       loader?.replaceWith(preview);
     }
