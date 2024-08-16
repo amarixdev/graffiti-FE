@@ -1,4 +1,4 @@
-import IndexDBManager from "../storage/indexed-db";
+import IndexDBManager from "../client-storage/indexed-db";
 
 export class FetchRequests {
   static PORT: number = 3000;

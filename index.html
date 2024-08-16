@@ -19,12 +19,12 @@
     <title>Spray Chat</title>
   </head>
 
-  <body class="bg-black">
+  <body class="bg-[#7b7b7b]">
     <div id="site-containter" class="w-full flex h-screen pt-[40px]">
       <!--Sign in Screen-->
       <section
         id="sign-in"
-        class="w-full h-screen bg-black fixed flex items-center -translate-y-14 justify-center"
+        class="w-full h-screen bg-black fixed flex items-center justify-center"
       >
         <div class="flex flex-col gap-14 items-center min-w-[650px]">
           <div class="flex flex-col gap-14 items-center">
@@ -103,11 +103,21 @@
       <section id="live-chat"></section>
 
       <!-- Canvas-->
+
       <section id="canvas-page" class="h-full w-full flex items-start hidden">
         <div
           id="canvas-container"
           class="z-0 relative border-green-500 border-2"
         >
+          <div
+            id="setup-loader-container"
+            class="w-full h-full flex items-center justify-center hidden pb-20 gap-2"
+          >
+            <span class="signature text-white text-3xl"
+              >Setting up canvas...</span
+            >
+            <span class="gear"></span>
+          </div>
           <div
             id="artists-screen"
             class="transition-all z-[100] flex justify-center absolute w-full h-full border-red-500 bg-black opacity-0 bg-opacity-80 backdrop-blur-sm"

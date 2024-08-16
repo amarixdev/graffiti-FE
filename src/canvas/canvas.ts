@@ -3,18 +3,17 @@ import { Socket } from "socket.io-client";
 import Stroke, { PaintStrokes } from "./paintstrokes";
 import Paint from "../util/paint";
 import SocketHandler from "../network/socket-handler";
-import { Button, Page, RequestMethod, SocketType } from "../util/enums";
+import { Button, RequestMethod } from "../util/enums";
 import UInterface from "../interface/main";
 import ServerOperations from "./server-operations";
 import { CanvasState } from "../util/enums";
 import { FetchRequests } from "../network/fetch-requests";
 import Worker from "./worker?worker";
 import SessionManager from "../session";
-import IndexDBManager from "../storage/indexed-db";
-import PageElements from "../interface/global/elements";
+import IndexDBManager from "../client-storage/indexed-db";
 
 export default class Canvas {
-  private p: p5;
+  private p: p5 | null = null;
   private socket: Socket;
   private canvasId: string = "";
   private interface: UInterface = new UInterface();
@@ -31,17 +30,25 @@ export default class Canvas {
 
   private constructor(socket: Socket) {
     this.socket = socket;
-    this.p = new p5(this.init);
+    try {
+      this.p = new p5(this.init);
+    } catch (error) {
+      console.log("Error setting up canvas: " + error);
+    }
   }
 
   //ensure a single instance of the socket is created
-  private static instance: Canvas;
+  private static instance: Canvas | null = null;
   static getInstance() {
     if (!Canvas.instance) {
       console.log("setting up canvas");
       Canvas.instance = new Canvas(SocketHandler.getInstance().getSocket());
     }
     return Canvas.instance;
+  }
+
+  static clearInstance() {
+    this.instance = null;
   }
 
   getCanvasId() {
@@ -75,7 +82,7 @@ export default class Canvas {
 
   loadBitmap(bitmap: ImageBitmap, strokes: Array<Stroke>) {
     this.bitmap = bitmap;
-    this.p.redraw();
+    this.p?.redraw();
     this.blankCanvas = false;
     this.paintStrokes.setOriginal(strokes);
   }
@@ -105,7 +112,7 @@ export default class Canvas {
 
       if (mainCanvas && ctx) {
         // Draw the bitmap onto the main canvas
-        this.p.redraw();
+        this.p?.redraw();
         console.log("bitmap done");
       }
     };
@@ -124,8 +131,8 @@ export default class Canvas {
 
   //clear canvas pixels; reset background
   clear(): void {
-    this.p.clear();
-    this.p.background(200, 200, 200);
+    this.p?.clear();
+    this.p?.background(200, 200, 200);
   }
 
   save(method: RequestMethod): void {
@@ -166,14 +173,14 @@ export default class Canvas {
   // }
 
   startLoop() {
-    this.p.loop();
+    this.p?.loop();
   }
 
   resizeCanvas() {
     const container = document.getElementById("canvas-container");
     if (container) {
-      this.p.resizeCanvas(container.clientWidth, container.clientHeight);
-      this.p.background(200, 200, 200);
+      this.p?.resizeCanvas(container.clientWidth, container.clientHeight);
+      this.p?.background(200, 200, 200);
     }
   }
 
@@ -203,18 +210,15 @@ export default class Canvas {
           this.bitmap.width,
           this.bitmap.height
         );
-        // p.filter("blur", 1);
-
-        const bitmap = await createImageBitmap(this.bitmap); // Assuming you have an ImageBitmap
-
+        const bitmap = await createImageBitmap(this.bitmap);
         IndexDBManager.getInstance().store(
           bitmap,
           this.canvasId,
           this.paintStrokes.get()
         );
-
+        
         this.bitmap = null;
-        console.log("done");
+
         //handle page updates;
         const ui = new UInterface();
         ui.restorePreview();
@@ -264,34 +268,36 @@ export default class Canvas {
     let { x, y, px, py, size, color } = stroke;
 
     let p = this.p;
-    let density = 300;
-    let rgb = Paint.stringToRGB(color);
-    const ellipses = [];
-    // Calculate the distance between the current and previous positions
-    let distance = p.dist(x, y, px, py);
-    let steps = Math.ceil(distance / 7);
+    if (p) {
+      let density = 300;
+      let rgb = Paint.stringToRGB(color);
+      const ellipses = [];
+      // Calculate the distance between the current and previous positions
+      let distance = p.dist(x, y, px, py);
+      let steps = Math.ceil(distance / 7);
 
-    //spray-paint effect
-    for (let i = 0; i < steps; i++) {
-      let interX = p.lerp(px, x, i / steps);
-      let interY = p.lerp(py, y, i / steps);
+      //spray-paint effect
+      for (let i = 0; i < steps; i++) {
+        let interX = p.lerp(px, x, i / steps);
+        let interY = p.lerp(py, y, i / steps);
 
-      for (let j = 0; j < density; j++) {
-        let angle = p.random(p.TWO_PI);
-        let radius = p.random(0, 10);
-        let offsetX = p.cos(angle) * radius;
-        let offsetY = p.sin(angle) * radius;
-        let alpha = p.map(radius, 0, 12, 255, 0);
-        const data = {
-          x: interX + offsetX,
-          y: interY + offsetY,
-          size: 1,
-          color: [rgb[0], rgb[1], rgb[2], alpha],
-        };
-        ellipses.push(data);
+        for (let j = 0; j < density; j++) {
+          let angle = p.random(p.TWO_PI);
+          let radius = p.random(0, 10);
+          let offsetX = p.cos(angle) * radius;
+          let offsetY = p.sin(angle) * radius;
+          let alpha = p.map(radius, 0, 12, 255, 0);
+          const data = {
+            x: interX + offsetX,
+            y: interY + offsetY,
+            size: 1,
+            color: [rgb[0], rgb[1], rgb[2], alpha],
+          };
+          ellipses.push(data);
+        }
       }
+      return ellipses;
     }
-    return ellipses;
   }
 
   private spray(stroke: Stroke) {
@@ -306,41 +312,42 @@ export default class Canvas {
     //   px = x;
     //   py = y;
     // }
+    if (p) {
+      // Calculate the distance between the current and previous positions
+      let distance = p.dist(x, y, px, py);
+      let steps = Math.ceil(distance / size);
 
-    // Calculate the distance between the current and previous positions
-    let distance = p.dist(x, y, px, py);
-    let steps = Math.ceil(distance / size);
+      //spray-paint effect
+      for (let i = 0; i < steps; i++) {
+        let interX = p.lerp(px, x, i / steps);
+        let interY = p.lerp(py, y, i / steps);
 
-    //spray-paint effect
-    for (let i = 0; i < steps; i++) {
-      let interX = p.lerp(px, x, i / steps);
-      let interY = p.lerp(py, y, i / steps);
+        for (let j = 0; j < density; j++) {
+          let angle = p.random(p.TWO_PI);
+          let radius = p.random(0, 12);
+          let offsetX = p.cos(angle) * radius;
+          let offsetY = p.sin(angle) * radius;
+          let alpha = p.map(radius, 0, 12, 255, 0);
 
-      for (let j = 0; j < density; j++) {
-        let angle = p.random(p.TWO_PI);
-        let radius = p.random(0, 12);
-        let offsetX = p.cos(angle) * radius;
-        let offsetY = p.sin(angle) * radius;
-        let alpha = p.map(radius, 0, 12, 255, 0);
-
-        if (p.mouseIsPressed) {
-          drawEllipse();
-          if (!this.isPainting) {
-            this.isPainting = true;
+          if (p.mouseIsPressed) {
+            drawEllipse();
+            if (!this.isPainting) {
+              this.isPainting = true;
+            }
+          } else {
+            //mouse lifted, save paintStrokes
+            if (this.isPainting) {
+              this.isPainting = false;
+              this.paintStrokes.insertNew(this.paintStroke);
+              this.paintStroke = [];
+            }
           }
-        } else {
-          //mouse lifted, save paintStrokes
-          if (this.isPainting) {
-            this.isPainting = false;
-            this.paintStrokes.insertNew(this.paintStroke);
-            this.paintStroke = [];
-          }
-        }
 
-        function drawEllipse() {
-          p.noStroke();
-          p.fill(rgb[0], rgb[1], rgb[2], 0.3 * alpha); // Adjust opacity as needed
-          p.ellipse(interX + offsetX, interY + offsetY, size, size);
+          function drawEllipse() {
+            p?.noStroke();
+            p?.fill(rgb[0], rgb[1], rgb[2], 0.3 * alpha); // Adjust opacity as needed
+            p?.ellipse(interX + offsetX, interY + offsetY, size, size);
+          }
         }
       }
     }

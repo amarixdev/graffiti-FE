@@ -79,7 +79,7 @@ export default class SocketHandler {
           string,
           { artists: string[] | null; img: ImageFile }
         >();
-        
+
         tagPreviews.forEach((preview) => {
           preview_map.set(preview.id!, {
             artists: preview.artists,
@@ -116,12 +116,14 @@ export default class SocketHandler {
         imagePreview.artists,
         imagePreview.imageFile
       );
-
       new UserInterface().renderPreviews(Previews.single);
+      console.log("done...!");
     });
 
     socket.on("preview-updated", (imagePreview: ImagePreview) => {
-      new UserInterface().updatePreview(imagePreview);
+      const ui = new UserInterface();
+      ui.display_UpdateLoader(imagePreview.id);
+      ui.updatePreview(imagePreview);
       console.log("preview updated");
     });
 

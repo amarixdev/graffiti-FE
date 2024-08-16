@@ -82,7 +82,7 @@ export default class ButtonHandler {
     // CanvasDisplay.getInstance();
   }
   private undoHandler() {
-    const canvas = Canvas.getInstance();
+    // const canvas = Canvas.getInstance();
     // canvas.undo();
   }
 }

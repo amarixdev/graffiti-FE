@@ -7,7 +7,6 @@ export default class ChatHandler {
   chatForm = document.getElementById("chat-form");
   chatLog = document.getElementById("chat-log");
   chatContainer = document.getElementById("chat-container");
-  chatPreview = document.getElementById("chat-preview");
 
   setupListeners() {
     console.log("set up");
@@ -21,19 +20,6 @@ export default class ChatHandler {
           socket.getSocket().emit("chat", message, user);
           this.addMessage(message, SocketType.user, user);
           this.chatInput.value = "";
-        }
-      }
-    });
-
-    this.chatPreview?.addEventListener("click", () => {
-      //TODO: Hide chat log
-      if (this.chatContainer && this.chatPreview) {
-        //hide preview, show log
-        if (this.chatContainer.classList.contains("hidden")) {
-          this.chatContainer.classList.remove("hidden");
-        } else {
-          //hide log
-          this.chatContainer.classList.add("hidden");
         }
       }
     });

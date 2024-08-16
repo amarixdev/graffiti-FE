@@ -7,6 +7,7 @@ import PageElements from "../global/elements";
 import { LoaderConstructor } from "./loaders";
 import { truncateString } from "../../util/functions";
 
+
 export default class PreviewConstructor {
   private elements = new PageElements();
 
@@ -26,12 +27,10 @@ export default class PreviewConstructor {
       const loadingView = document.getElementById("loading-view");
       const previewContainer = this.constructContainer(id);
       const img = this.constructImage(id, data.img, data.artists);
+      const tagAlert = document.createElement("img");
 
       previewContainer.append(img);
       previewContainer.append(this.constructArtistUI(data.artists));
-
-      const tagAlert = document.createElement("img");
-
       previewContainer.appendChild(tagAlert);
       if (loadingView) {
         loadingView.replaceWith(previewContainer);
@@ -69,7 +68,7 @@ export default class PreviewConstructor {
     }
   }
 
-  /** add styles to preview interface */
+  /** add artist display to canvas preview  */
   private constructArtistUI(username: string[] | null): HTMLDivElement {
     const details = document.createElement("div");
     Object.assign(details.style, {
@@ -90,7 +89,7 @@ export default class PreviewConstructor {
       let artistTag = "";
       switch (username.length) {
         case 1:
-          artistTag = `${truncateString(username[0], 30)}  ${username.length}`;
+          artistTag = `${truncateString(username[0], 30)}`;
           break;
         case 2:
           artistTag = `${truncateString(
@@ -115,7 +114,7 @@ export default class PreviewConstructor {
     return details;
   }
 
-  /** creates a container for a preview  */
+  /** creates a container for a canvas preview  */
   private constructContainer(id: string): HTMLDivElement {
     const previewContainer = document.createElement("div");
 
@@ -161,7 +160,7 @@ export default class PreviewConstructor {
       //fetch canvas from database or client storage (indexedDB)
       await FetchRequests.renderCanvas(id).then((data: any) => {
         console.log("Success:", data);
-        const canvas = Canvas.getInstance(); //cannot setup canvas if it is hidden
+        const canvas = Canvas.getInstance();
         canvas.clear();
         canvas.setCanvasId(id);
         if (data.isLocal) {

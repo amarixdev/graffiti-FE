@@ -73,6 +73,7 @@ export default class UserInterface {
 
   restorePreview(): void {
     this.previewConstructor.restore();
+    
   }
 
   //handles updated canvas preview display

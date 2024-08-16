@@ -1,3 +1,4 @@
+import Canvas from "./canvas/canvas";
 import SocketHandler from "./network/socket-handler";
 import { Page } from "./util/enums";
 import { ImageFile, ImagePreview } from "./util/types";
@@ -104,5 +105,7 @@ export default class SessionManager {
     this.tagPreviews_map.delete(id);
   }
 }
-
+window.onload = () => {
+  Canvas.clearInstance();
+};
 SessionManager.getInstance().setUp();

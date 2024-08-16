@@ -79,6 +79,8 @@ export default class EventListeners {
     if (session.getPage() == Page.community) {
       session.setPage(Page.canvas);
       new UserInterface().updatePage();
+      //initialize canvas if not already
+      Canvas.getInstance();
     }
   };
 
@@ -98,18 +100,22 @@ export default class EventListeners {
   }
 
   listenBegin_Button() {
+    Canvas.clearInstance(); //ensure canvas has not been initialized
     const beginButton = document.getElementById("begin-btn");
     beginButton?.addEventListener("click", () => {
       const input = document.getElementById(
         "custom-user-input"
       ) as HTMLInputElement;
 
+      const session = SessionManager.getInstance();
+      const ui = new UserInterface();
+
       //set username
       const customUsername = input.value;
       const userTag = document.getElementById("user-tag");
       if (userTag) {
         if (customUsername.length > 0) {
-          SessionManager.getInstance().setUsername(customUsername);
+          session.setUsername(customUsername);
           userTag.textContent = customUsername;
           SocketHandler.getInstance()
             .getSocket()
@@ -120,9 +126,21 @@ export default class EventListeners {
       //update UI
       const signInScreen = document.getElementById("sign-in");
       signInScreen?.classList.add("hidden");
-      this.elements.canvasPage()?.classList.remove("hidden");
-      Canvas.getInstance();
-      new UserInterface().setupListeners_app();
+      const canvasPage = document.getElementById("canvas-page");
+      const setupLoader = document.getElementById("setup-loader-container");
+      if (canvasPage) {
+        canvasPage.classList.remove("hidden");
+        setupLoader?.classList.remove("hidden");
+
+        //ensure canvas is setup by introducing a delay
+        const RENDER_DELAY = 800;
+        setTimeout(() => {
+          setupLoader?.classList.add("hidden");
+          document.body.style.backgroundColor = "black";
+          Canvas.getInstance();
+          ui.setupListeners_app();
+        }, RENDER_DELAY);
+      }
     });
   }
 
@@ -147,15 +165,6 @@ export default class EventListeners {
       }
       SocketHandler.getInstance().getSocket().emit("generate-user");
       button.disabled = true;
-    });
-  }
-
-  //DEV ONLY ###################################################################################################//
-  listenClear_Button() {
-    this.elements.clearButton()?.addEventListener("click", () => {
-      const canvas = Canvas.getInstance();
-      SocketHandler.getInstance().getSocket().emit("clear");
-      canvas.clear();
     });
   }
 
@@ -192,5 +201,14 @@ export default class EventListeners {
     }
     session.setArtistMode(false);
     this.elements.artistButtons()?.classList.add("hidden");
+  }
+  
+  //DEV ONLY ###################################################################################################//
+  listenClear_Button() {
+    this.elements.clearButton()?.addEventListener("click", () => {
+      const canvas = Canvas.getInstance();
+      SocketHandler.getInstance().getSocket().emit("clear");
+      canvas.clear();
+    });
   }
 }

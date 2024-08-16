@@ -3,7 +3,7 @@ import { FetchRequests } from "../network/fetch-requests";
 import Canvas from "./canvas";
 import SessionManager from "../session";
 import UInterface from "../interface/main";
-import IndexDBManager from "../storage/indexed-db";
+import IndexDBManager from "../client-storage/indexed-db";
 import Stroke from "./paintstrokes";
 
 export default class ServerOperations {
