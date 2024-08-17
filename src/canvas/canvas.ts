@@ -244,6 +244,11 @@ export default class Canvas {
       this.spray(stroke);
     };
 
+    p.windowResized = () => {
+      
+      p.redraw();
+    };
+
     //handles live stroke updates
     p.mouseDragged = () => {
       if (this.tag.length == 0) {

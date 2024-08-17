@@ -37,7 +37,15 @@ export default class SocketHandler {
     const username = document.createElement("p");
     username.innerText = this.sessionUsername;
     username.id = "generated-username";
-    username.classList.add("signature", "text-white", "text-2xl");
+    username.classList.add(
+      "signature",
+      "text-white",
+      "text-2xl",
+      "2xl:text-3xl",
+      "3xl:text-4xl",
+      "4xl:text-5xl",
+      "5xl:text-6xl"
+    ); 
     const username_loader = document.getElementById("username-loader");
     if (username) {
       username_loader?.replaceWith(username);

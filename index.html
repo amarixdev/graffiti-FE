@@ -20,79 +20,99 @@
   </head>
 
   <body class="bg-[#7b7b7b]">
-    <div id="site-containter" class="w-full flex h-screen pt-[40px]">
+    <div id="site-containter" class="w-full flex h-screen pt-[2%] fixed">
       <!--Sign in Screen-->
       <section
         id="sign-in"
         class="w-full h-screen bg-black fixed flex items-center justify-center"
       >
-        <div class="flex flex-col gap-14 items-center min-w-[650px]">
-          <div class="flex flex-col gap-14 items-center">
-            <div class="flex flex-col">
-              <div class="text-white text-5xl">Welcome To SprayChat</div>
-              <div class="text-[#bebebe] text-3xl">
+        <div
+          class="flex flex-col gap-14 items-center min-w-[850px] 3xl:min-w-[1200px] 5xl:min-w-[2000px] border-red-500"
+        >
+          <div
+            class="flex flex-col gap-14 2xl:gap-20 3xl:gap-28 4xl:gap-32 5xl:gap-40 items-center w-[70%]"
+          >
+            <div class="flex flex-col gap-2 3xl:gap-4 5xl:gap-7">
+              <div
+                class="text-white text-5xl 2xl:text-6xl 3xl:text-7xl 4xl:text-8xl 5xl:text-9xl"
+              >
+                Welcome To SprayChat
+              </div>
+              <div
+                class="text-[#bebebe] text-3xl 2xl:text-4xl 3xl:text-5xl 4xl:text-6xl 5xl:text-7xl"
+              >
                 A Collaborative Online Art Wall
               </div>
-            </div>
-            <div
-              class="flex gap-5 items-center justify-center min-w-full pl-24"
-            >
-              <i class="fa-solid fa-user text-white text-2xl"></i>
               <div
-                class="flex items-center justify-start gap-4 min-w-[550px] h-20"
+                class="flex gap-5 items-center justify-center w-full mt-[5%]"
               >
-                <div class="text-3xl text-white">Sign in as:</div>
-                <div id="user-signin">
-                  <!--loader source: https://flowbite.com/docs/components/spinner/-->
-                  <svg
-                    id="username-loader"
-                    aria-hidden="true"
-                    class="inline w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-gray-600 dark:fill-gray-300"
-                    viewBox="0 0 100 101"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
+                <i
+                  class="fa-solid fa-user text-white text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl 5xl:text-6xl"
+                ></i>
+                <div
+                  class="flex items-center justify-start gap-[2%] min-w-[550px] 3xl:min-w-[1000px] 5xl:min-w-[1600px] h-20"
+                >
+                  <div
+                    class="text-3xl 2xl:text-4xl 3xl:text-5xl 4xl:text-6xl 5xl:text-7xl text-white"
                   >
-                    <path
-                      d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
-                      fill="currentColor"
-                    />
-                    <path
-                      d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
-                      fill="currentFill"
-                    />
-                  </svg>
+                    Sign in as:
+                  </div>
+                  <div id="user-signin">
+                    <!--loader source: https://flowbite.com/docs/components/spinner/-->
+                    <svg
+                      id="username-loader"
+                      aria-hidden="true"
+                      class="inline w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-gray-600 dark:fill-gray-300"
+                      viewBox="0 0 100 101"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                        fill="currentColor"
+                      />
+                      <path
+                        d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                        fill="currentFill"
+                      />
+                    </svg>
+                  </div>
+                  <input
+                    type="text"
+                    id="custom-user-input"
+                    placeholder="johndoe88"
+                    class="hidden lowercase -translate-x-3 py-[1%] px-3 text-lg 2xl:text-xl 3xl:text-2xl 4xl:text-3xl 5xl:text-4xl signature text-white border-2 border-[#333] w-6/12 bg-black rounded-lg"
+                  />
                 </div>
-                <input
-                  type="text"
-                  id="custom-user-input"
-                  placeholder="johndoe88"
-                  class="hidden lowercase -translate-x-3 py-2 px-3 text-lg signature text-white border-2 border-[#333] w-6/12 bg-black rounded-lg"
-                />
+              </div>
+              <div
+                class="flex mt-[5%] px-[1%] items-center justify-between w-full font-semibold"
+              >
+                <button
+                  id="generate-username"
+                  class="text-white flex hover:text-[#7adaf7] items-center gap-2 text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl 5xl:text-6xl active:scale-95 transition-all"
+                >
+                  <i
+                    class="fa-solid fa-shuffle text-lg 2xl:text-xl 3xl:text-2xl 4xl:text-3xl 5xl:text-4xl"
+                  ></i>
+                  <p>Generate name</p>
+                </button>
+
+                <button
+                  id="customize-username"
+                  class="text-white hover:text-[#48f459] flex items-center gap-2 text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl 5xl:text-6xl active:scale-95 transition-all"
+                >
+                  <i
+                    class="fa-solid fa-pencil text-lg 2xl:text-xl 3xl:text-2xl 4xl:text-3xl 5xl:text-4xl"
+                  ></i>
+                  <p>Customize name</p>
+                </button>
               </div>
             </div>
           </div>
 
-          <div
-            class="flex gap-16 items-center justify-center w-full font-semibold"
-          >
-            <button
-              id="generate-username"
-              class="text-white flex hover:text-[#7adaf7] items-center gap-2 text-2xl active:scale-95 transition-all"
-            >
-              <i class="fa-solid fa-shuffle text-lg"></i>
-              <p>Generate name</p>
-            </button>
-
-            <button
-              id="customize-username"
-              class="text-white hover:text-[#48f459] flex items-center gap-2 text-2xl active:scale-95 transition-all"
-            >
-              <i class="fa-solid fa-pencil text-lg"></i>
-              <p>Customize name</p>
-            </button>
-          </div>
           <button
-            class="signature text-white rounded-md mt-16 text-4xl w-6/12 bg-[#444] p-4 active:scale-95 transition-all"
+            class="signature text-white rounded-md mt-16 3xl:mt-24 5xl:mt-32 text-4xl 2xl:text-5xl 3xl:text-6xl 4xl:text-7xl 5xl:text-8xl w-6/12 bg-[#444] p-4 3xl:p-8 5xl:p-10 active:scale-95 transition-all"
           >
             <p id="begin-btn" class="hover:animate-pulse">Begin</p>
           </button>
@@ -100,18 +120,21 @@
       </section>
 
       <!-- Live Chat -->
-      <section id="live-chat"></section>
+      <section
+        class="border-2 border-red-500 max-w-[22%] min-w-[22%]"
+        id="live-chat"
+      ></section>
 
       <!-- Canvas-->
 
       <section id="canvas-page" class="h-full w-full flex items-start hidden">
         <div
           id="canvas-container"
-          class="z-0 relative border-green-500 border-2"
+          class="z-0 relative border-2 border-green-600"
         >
           <div
             id="setup-loader-container"
-            class="w-full h-full flex items-center justify-center hidden pb-20 gap-2"
+            class="w-full h-full flex items-center justify-center hidden pb-20 gap-2 border-4 border-red-500"
           >
             <span class="signature text-white text-3xl"
               >Setting up canvas...</span
@@ -136,7 +159,7 @@
         <!--Canvas Utility Buttons-->
         <section
           id="util-buttons"
-          class="h-full w-full border-2 border-orange-600 bg-black flex pt-4 flex-col items-center"
+          class="w-full min-w-fit h-full border-2 border-purple-600 bg-black flex pt-4 flex-col items-center"
         ></section>
       </section>
 
@@ -146,10 +169,18 @@
           id="color-backdrop"
           class="z-[0] w-screen min-h-full fixed bg-gradient-to-b to-[#000] from-[#30abd0]"
         ></div>
-        <div class="fixed w-full bg-[#121212] top-10 h-20 z-[9999]">
-          <div class="flex flex-col p-3">
-            <p class="text-3xl font-light text-white">Community</p>
-            <p class="text-1xl font-light text-[#a5a5a5]">
+        <div class="fixed w-full bg-[#121212] top-[4%] h-[11%] z-[9999]">
+          <div
+            class="flex flex-col p-3 2xl:p-5 3xl:p-10 5xl:p-16 2xl:gap-2 3xl:gap-4 4xl:gap-6"
+          >
+            <p
+              class="text-3xl 2xl:text-4xl 3xl:text-5xl 4xl:text-6xl 5xl:text-7xl font-light text-white"
+            >
+              Community
+            </p>
+            <p
+              class="text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl 5xl:text-5xl font-light text-[#a5a5a5]"
+            >
               Collaborate with other artists. Select a canvas to leave your
               mark.
             </p>
@@ -157,7 +188,7 @@
         </div>
         <div
           id="community-grid"
-          class="grid grid-cols-3 gap-x-[10px] gap-y-[30px] max-h-full p-5 top-20 relative"
+          class="grid grid-cols-3 3xl:grid-cols-4 4xl:grid-cols-5 gap-x-[10px] gap-y-[30px] max-h-full p-5 top-[12%] relative"
         ></div>
 
         <button

@@ -35,18 +35,20 @@ export default class ChatHandler {
       newMessage.style.backgroundColor = "#4b4b4b"; // Apply background color directly
     } else if (type === SocketType.user) {
       newMessage.style.backgroundColor = "#2a92e8"; // Apply background color directly
-      newMessage.style.transform = "translateX(65px)"; // Translate 80px in the x direction
+      newMessage.style.transform = "translateX(30%)"; 
     }
 
     // Create the user paragraph
     const userBubble = document.createElement("p");
     userBubble.className = "user";
     userBubble.textContent = user;
+    this.formatFontSize(userBubble);
 
     // Create the message paragraph
     const remoteBubble = document.createElement("p");
     remoteBubble.className = "message";
     remoteBubble.textContent = message;
+    this.formatFontSize(remoteBubble);
 
     // Append paragraphs to the container span
     newMessage.appendChild(userBubble);
@@ -54,5 +56,38 @@ export default class ChatHandler {
 
     // Insert the new message as the first child
     this.chatLog?.insertBefore(newMessage, this.chatLog.firstChild);
+  }
+  private formatFontSize(element: HTMLDivElement) {
+    Object.assign(element.style, {
+      fontSize: "0.85rem", // default size
+    });
+
+    if (window.matchMedia("(min-width: 1536px)").matches) {
+      // 2xl
+      Object.assign(element.style, {
+        fontSize: "1.0rem", // Tailwind's lg
+      });
+    }
+
+    if (window.matchMedia("(min-width: 1920px)").matches) {
+      // 3xl
+      Object.assign(element.style, {
+        fontSize: "1.125rem", // Tailwind's xl
+      });
+    }
+
+    if (window.matchMedia("(min-width: 2560px)").matches) {
+      // 4xl
+      Object.assign(element.style, {
+        fontSize: "1.25rem", // Tailwind's 2xl
+      });
+    }
+
+    if (window.matchMedia("(min-width: 3200px)").matches) {
+      // 5xl
+      Object.assign(element.style, {
+        fontSize: "1.5rem", // Tailwind's 3xl
+      });
+    }
   }
 }

@@ -13,10 +13,6 @@ input:focus {
   outline: none;
 }
 
-#canvas-container {
-  min-width: 62vw;
-  height: 100%;
-}
 
 .setup-loader {
   font-size: 28px;

@@ -15,11 +15,12 @@ export default class ServerOperations {
     const artist_canvas = document.getElementById(
       "artist-canvas"
     ) as HTMLCanvasElement;
+    console.log(artist_canvas)
     const compression = 0.0001;
     artist_canvas.toBlob(
       async (img) => {
         let tag = canvas.getPaintStrokes();
-
+        console.log(img);
         const formData = new FormData();
         formData.append("tag", JSON.stringify(tag));
         formData.append("image", img!, "canvas.png"); // Append the blob with a filename

@@ -105,7 +105,26 @@ export default class SessionManager {
     this.tagPreviews_map.delete(id);
   }
 }
+window.onresize = () => {
+  location.reload();
+};
 window.onload = () => {
-  Canvas.clearInstance();
+  const container = document.getElementById(
+    "canvas-container"
+  ) as HTMLDivElement;
+  const loader = document.getElementById(
+    "setup-loader-container"
+  ) as HTMLDivElement;
+  // Get the smaller of the window's width and height
+  const size = Math.min(window.innerWidth, window.innerHeight);
+  const paddingTopOffset = size * 0.035;
+  const defaultWidth = size * 1.15;
+  const defaultHeight = size - paddingTopOffset;
+
+  container.style.minWidth = `${defaultWidth}px`;
+  container.style.minHeight = `${defaultHeight}px`;
+  loader.style.minWidth = `${defaultWidth}px`;
+  loader.style.minHeight = `${defaultHeight}px`;
+  console.log(size);
 };
 SessionManager.getInstance().setUp();

@@ -136,6 +136,7 @@ export default class EventListeners {
 
           //ensures a new instance is initialized each time
           if (Canvas.hasInstance()) {
+            console.log("resetting instance");
             Canvas.clearInstance();
           }
           Canvas.getInstance();
